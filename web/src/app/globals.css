@@ -1,0 +1,79 @@
+/* DEV-Pedia Design System Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&display=swap');
+
+/* DEV-Pedia Color Palette */
+:root {
+  /* Classification Level Colors - Light Theme (Blue) */
+  --classification-1-light: #777799;
+  --classification-1-light-shadow: #666688;
+  --classification-2-light: #6688cc;
+  --classification-2-light-shadow: #5577bb;
+  --classification-3-light: #6699ee;
+  --classification-3-light-shadow: #5588dd;
+  --classification-4-light: #77aaff;
+  --classification-4-light-shadow: #6699ee;
+  --classification-5-light: #8cb4ff;
+  --classification-5-light-shadow: #7ba3ee;
+
+  /* Classification Level Colors - Dark Theme (Orange) */
+  --classification-1-dark: #aa9977;
+  --classification-1-dark-shadow: #998866;
+  --classification-2-dark: #b39955;
+  --classification-2-dark-shadow: #a38844;
+  --classification-3-dark: #cc9944;
+  --classification-3-dark-shadow: #bb8833;
+  --classification-4-dark: #e6a943;
+  --classification-4-dark-shadow: #d59832;
+  --classification-5-dark: #ffb74c;
+  --classification-5-dark-shadow: #ee9a35;
+
+  /* RGB versions for alpha transparency */
+  --text-color-rgb: 0, 0, 0;
+  --classification-1-light-rgb: 119, 119, 153;
+  --classification-1-dark-rgb: 170, 153, 119;
+  --classification-2-light-rgb: 102, 136, 204;
+  --classification-2-dark-rgb: 179, 153, 85;
+  --classification-3-light-rgb: 102, 153, 238;
+  --classification-3-dark-rgb: 204, 153, 68;
+  --classification-4-light-rgb: 119, 170, 255;
+  --classification-4-dark-rgb: 230, 169, 67;
+  --classification-5-light-rgb: 140, 180, 255;
+  --classification-5-dark-rgb: 255, 183, 76;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+body {
+  font-family: 'Google Sans Code', monospace;
+  font-weight: 400;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Links */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Focus States */
+*:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
+}

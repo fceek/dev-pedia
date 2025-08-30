@@ -1,0 +1,100 @@
+.classificationIndicator {
+    display: flex;
+    gap: 1rem;
+    padding-bottom: 2px;
+    user-select: none;
+}
+
+.classificationIndicator.interactive {
+    cursor: pointer;
+}
+
+.circle {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 0.375rem;
+    border: 0.125rem solid var(--border-color);
+    background: transparent;
+}
+
+.circle.filledNormal {
+    background: var(--text-color);
+    border-color: var(--text-color);
+    box-shadow: 0 0 0.875rem 0.0625rem var(--text-color);
+}
+
+.circle.filledAdmin1 {
+    background: var(--admin-color-1, var(--text-color));
+    border-color: var(--admin-color-1, var(--text-color));
+    box-shadow: 0 0 0.875rem 0.0625rem var(--admin-shadow-1, var(--text-color));
+}
+
+.circle.filledAdmin2 {
+    background: var(--admin-color-2, var(--text-color));
+    border-color: var(--admin-color-2, var(--text-color));
+    box-shadow: 0 0 0.875rem 0.0625rem var(--admin-shadow-2, var(--text-color));
+}
+
+.circle.filledAdmin3 {
+    background: var(--admin-color-3, var(--text-color));
+    border-color: var(--admin-color-3, var(--text-color));
+    box-shadow: 0 0 0.875rem 0.0625rem var(--admin-shadow-3, var(--text-color));
+}
+
+.circle.filledAdmin4 {
+    background: var(--admin-color-4, var(--text-color));
+    border-color: var(--admin-color-4, var(--text-color));
+    box-shadow: 0 0 0.875rem 0.0625rem var(--admin-shadow-4, var(--text-color));
+}
+
+.circle.filledAdmin5 {
+    background: var(--admin-color-5, var(--text-color));
+    border-color: var(--admin-color-5, var(--text-color));
+    box-shadow: 0 0 0.875rem 0.0625rem var(--admin-shadow-5, var(--text-color));
+}
+
+.circle.animating.filledNormal,
+.circle.animating.filledAdmin1,
+.circle.animating.filledAdmin2,
+.circle.animating.filledAdmin3,
+.circle.animating.filledAdmin4,
+.circle.animating.filledAdmin5 {
+    animation: lightUp 0.3s ease-out;
+}
+
+.circle.animating:not(.filledNormal):not(.filledAdmin1):not(.filledAdmin2):not(.filledAdmin3):not(.filledAdmin4):not(.filledAdmin5) {
+    animation: lightDown 0.3s ease-out;
+}
+
+/* Note: These animations will use the background/border colors set by each specific filled class */
+@keyframes lightUp {
+    from {
+        background: transparent;
+        border-color: var(--border-color);
+        box-shadow: none;
+        transform: scale(0.8);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    to {
+        /* Final colors will be determined by the specific filled class */
+        transform: scale(1);
+    }
+}
+
+@keyframes lightDown {
+    from {
+        /* Starting colors will be determined by the specific filled class */
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.9);
+    }
+    to {
+        background: transparent;
+        border-color: var(--border-color);
+        box-shadow: none;
+        transform: scale(1);
+    }
+}

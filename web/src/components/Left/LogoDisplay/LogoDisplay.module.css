@@ -1,0 +1,11 @@
+.logoDisplay {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--text-color);
+    text-align: center;
+    line-height: 1;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

@@ -1,0 +1,89 @@
+/* CLICKABLE GLOW — fixed size, top-right */
+.buildGlow{
+  position: fixed;
+  top: -1.25rem;
+  right: -1.25rem;
+  width: 6rem;
+  height: 6rem;
+  border-radius: 100%;
+  display: block;
+  text-decoration: none;
+  z-index: 40;
+  cursor: pointer;
+}
+
+/* the bright core inside the hotspot */
+.buildGlow::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  filter: blur(6px);
+  opacity:.95;
+  animation: breathe 3s ease-in-out infinite;
+}
+
+/* the outer halo that makes it feel like light */
+.buildGlow::after{
+  content:"";
+  position:absolute;
+  border-radius:inherit;
+  pointer-events:none;
+  width: 200%;
+  height: 200%;
+  left: -50%;
+  top: -50%;
+  filter: blur(24px);
+  opacity:.78;
+  z-index:-1;
+  animation: breatheSlow 4s ease-in-out infinite;
+}
+
+.buildGlow::before{
+  background-image: var(--build-glow-gradient);
+}
+.buildGlow::after{
+  background-image: var(--build-glow-cast);
+}
+
+/* tiny "alive" hover—keep or remove */
+/* hover effects */
+.buildGlow:hover::before{ 
+  opacity: 1; 
+  filter: blur(8px); 
+  animation-duration: 2s;
+}
+.buildGlow:hover::after{ 
+  opacity: .9; 
+  filter: blur(28px); 
+  animation-duration: 2.5s;
+}
+
+/* breathing animations */
+@keyframes breathe {
+  0%, 100% { 
+    opacity: .7; 
+    filter: blur(6px);
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1; 
+    filter: blur(12px);
+    transform: scale(1.15);
+  }
+}
+
+@keyframes breatheSlow {
+  0%, 100% { 
+    opacity: .6; 
+    filter: blur(20px);
+    transform: scale(1);
+  }
+  50% { 
+    opacity: .9; 
+    filter: blur(35px);
+    transform: scale(1.2);
+  }
+}
+

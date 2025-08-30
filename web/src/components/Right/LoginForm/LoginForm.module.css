@@ -1,0 +1,129 @@
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    padding: 3.5rem 0.5rem 1rem 3.5rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.formWrapper {
+    width: 100%;
+    max-width: 20rem;
+}
+
+.formContent {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    line-height: 1;
+}
+
+.tokenInput {
+    background: transparent;
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-family: inherit;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+    outline: none;
+    width: 100%;
+}
+
+.tokenInput:focus {
+    border-color: var(--text-color);
+    box-shadow: 0 0 0 1px var(--text-color);
+}
+
+.tokenInput::placeholder {
+    color: var(--text-color);
+    opacity: 0.5;
+}
+
+.tokenInput:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.buttonGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.button {
+    background: transparent;
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    width: 100%;
+}
+
+.button:hover:not(.disabled) {
+    background: var(--text-color);
+    color: var(--bg-color);
+}
+
+.button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.loginButton {
+    border-color: var(--text-color);
+}
+
+.guestButton {
+    border-color: var(--border-color);
+    opacity: 0.7;
+}
+
+.guestButton:hover {
+    opacity: 1;
+}
+
+.errorText {
+    font-size: 0.75rem;
+    color: #ff6b6b;
+    line-height: 1.4;
+    padding: 0.5rem;
+    border: 1px solid #ff6b6b;
+    border-radius: 0.25rem;
+    background: rgba(255, 107, 107, 0.1);
+}
+
+.errorText p {
+    margin: 0;
+}
+
+.helpText {
+    font-size: 0.75rem;
+    color: var(--text-color);
+    opacity: 0.6;
+    line-height: 1.4;
+}
+
+.helpText p {
+    margin: 0;
+}

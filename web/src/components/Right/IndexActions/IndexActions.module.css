@@ -1,0 +1,41 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem;
+    min-height: 0;
+    height: 100%;
+}
+
+.square {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    max-width: 8rem;
+    width: 100%;
+    position: relative; /* For pseudo-element positioning */
+}
+
+.filled {
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    border: 2px solid var(--text-color);
+}
+
+.filled:hover {
+    background-color: transparent;
+    color: var(--text-color);
+}
+
+.container {
+    position: relative; /* For absolute positioning of overlay */
+}
+
+/* CSS animations removed - using JavaScript for precise control */

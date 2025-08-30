@@ -1,0 +1,23 @@
+.quickActions {
+    font-family: 'Google Sans Code', monospace;
+}
+
+.sectionTitle {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1rem;
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+}
+
+.list {
+    padding-left: 1rem;
+}
+
+.placeholder {
+    font-size: 0.75rem;
+    color: var(--text-color);
+    opacity: 0.6;
+    font-style: italic;
+}

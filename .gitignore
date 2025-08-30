@@ -1,0 +1,97 @@
+# Documentation (excluded)
+.docs/
+
+# Go
+backend/bin/
+backend/*.exe
+backend/*.exe~
+backend/*.dll
+backend/*.so
+backend/*.dylib
+backend/*.test
+backend/*.out
+backend/go.work
+backend/go.work.sum
+backend/vendor/
+backend/coverage.out
+backend/coverage.html
+backend/.env
+# This local is local so is safe
+# backend/.env.local
+
+# Next.js
+web/.next/
+web/out/
+web/build/
+web/dist/
+
+# Node.js
+web/node_modules/
+web/npm-debug.log*
+web/yarn-debug.log*
+web/yarn-error.log*
+web/.pnpm-debug.log*
+
+# Environment files
+web/.env
+web/.env*.local
+web/.vercel
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Redis
+dump.rdb
+
+# Azure
+.azure/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+.temp/
+CLAUDE.local.md
+
+CLAUDE.md
+
+.ref/
+
+.claude/
+
+

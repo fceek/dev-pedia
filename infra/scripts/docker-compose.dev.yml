@@ -1,0 +1,50 @@
+services:
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile.dev
+    image: dev-pedia-backend:dev
+    ports:
+      - "9001:8080"
+    environment:
+      - DATABASE_URL=postgres://dev_pedia_user:dev_pedia_pass@postgres:5432/dev_pedia?sslmode=disable
+      - REDIS_URL=redis://redis:6379
+      - GOD_TOKEN=0198f29c-ce40-76e6-8cb5-4f0e87dd666b
+    volumes:
+      - ../../backend:/app
+    depends_on:
+      - postgres
+      - redis
+
+#  frontend:
+#    build:
+#      context: ../../web
+#      dockerfile: Dockerfile.dev
+#    image: dev-pedia-frontend:dev
+#    ports:
+#      - "9002:3000"
+#    environment:
+#      - NEXT_PUBLIC_API_URL=http://backend:8080
+#    volumes:
+#      - ../../web:/app
+#      - /app/node_modules
+#    command: ["npm", "run", "dev"]
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - "9432:5432"
+    environment:
+      - POSTGRES_DB=dev_pedia
+      - POSTGRES_USER=dev_pedia_user
+      - POSTGRES_PASSWORD=dev_pedia_pass
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+    ports:
+      - "9379:6379"
+
+volumes:
+  postgres-data:

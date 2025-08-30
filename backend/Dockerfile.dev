@@ -1,0 +1,20 @@
+FROM golang:1.25-alpine
+
+WORKDIR /app
+
+RUN apk add --no-cache git ca-certificates tzdata curl
+
+# Install swag for generating API docs
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+
+COPY go.mod ./
+COPY go.su[m] ./
+RUN go mod download
+
+# Copy source code (needed for swag to find Go files)
+# COPY . .
+
+EXPOSE 8080
+
+# Generate docs and run server
+CMD ["sh", "-c", "swag init -g cmd/server/main.go -o docs --parseDependency && go run cmd/server/main.go"]

@@ -1,0 +1,78 @@
+/* Theme variables */
+.container {
+    /* Light theme (default) */
+    --bg-color: #f5f5f0;
+    --text-color: black;
+    --border-color: black;
+    --accent-color: white;
+    --accent-text: black;
+    --gradient: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+    --build-glow-gradient: radial-gradient(160% 160% at 92% 8%,
+    rgba(140,180,255,.98) 0%,
+    rgba(115,155,255,.79) 22%,
+    rgba(128, 215, 246, 0.5) 46%,
+    rgba(255,255,255,0) 76%);
+    --build-glow-cast: radial-gradient(closest-side at 92% 8%,
+    rgba(115,155,255,.58) 0%,
+    rgba(195, 246, 255, 0.3) 32%,
+    rgba(255,255,255,0) 68%);
+    
+    height: 100vh;
+    width: 100vw;
+    background: transparent;
+    color: var(--text-color);
+    margin: 0;
+    padding: 0 5%;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    grid-template-rows: 8vh 1fr 10vh;
+    grid-template-areas:
+    "header header"
+    "leftColumn rightColumn"
+    "footer footer";
+    transition: background-color 0.05s ease, color 0.05s ease, grid-template-rows 0.5s ease;
+    overflow: hidden;
+}
+
+/* Dark theme */
+.container.dark {
+    --bg-color: #1a1a1a;
+    --text-color: white;
+    --border-color: white;
+    --accent-color: black;
+    --accent-text: white;
+    --gradient: linear-gradient(90deg, #d32f2f, #00695c, #1565c0, #2e7d32);
+    --build-glow-gradient: radial-gradient(140% 140% at 92% 8%, rgba(255,241,182,.55) 0%, rgba(255,183, 76,.32) 26%, rgba(255,120, 61,.18) 48%, rgba(255,255,255,0) 60%);
+    --build-glow-cast: radial-gradient(closest-side at 92% 8%, rgba(255,196, 90,.38) 0%, rgba(255,140, 60,.22) 38%, rgba(255,255,255,0) 66%);
+}
+
+/* Flash theme - mid-tone for gentler flashing */
+.container.flash {
+    --bg-color: #666666;
+    --text-color: #cccccc;
+    --border-color: #cccccc;
+    --accent-color: #333333;
+    --accent-text: #cccccc;
+}
+
+/* Expanded state - immersive reading */
+.container.expanded {
+    grid-template-rows: 0vh 1fr 0vh;
+}
+
+/* Non-admin pages - apply background color */
+.container.nonAdmin {
+    background: var(--bg-color);
+}
+
+.leftColumn {
+    grid-area: leftColumn;
+    height: 100%;
+    overflow: hidden;
+}
+
+.rightColumn {
+    grid-area: rightColumn;
+}
+

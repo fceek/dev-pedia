@@ -1,0 +1,29 @@
+.tocList {
+    list-style: none;
+    margin: 2rem 0 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.tocItem {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-color);
+    opacity: 0.6;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.tocItem:hover {
+    opacity: 1;
+}
+
+.tocItem.level0 {
+    padding-left: 0;
+}
+
+.tocItem.level1 {
+    padding-left: 1rem;
+}
