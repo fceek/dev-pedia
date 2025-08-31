@@ -14,7 +14,7 @@
     position: absolute;
     left: 1rem;
     top: -4rem; /* Connect to header border */
-    bottom: 0;
+    bottom: 4rem;
     width: 2px;
     background: var(--border-color);
     z-index: 1;

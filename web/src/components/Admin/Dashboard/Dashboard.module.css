@@ -9,6 +9,6 @@
 .cardsGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-    gap: 2rem;
+    gap: 5rem 2rem;
     align-items: start;
 }

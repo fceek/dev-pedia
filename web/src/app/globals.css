@@ -27,6 +27,25 @@
   --classification-5-dark: #ffb74c;
   --classification-5-dark-shadow: #ee9a35;
 
+  /* File Status Tinted Colors */
+  /* Documented (Success with glow) */
+  --documented-light: #8cb4ff;
+  --documented-light-glow: #a8c7ff;
+  --documented-dark: #ffb74c;
+  --documented-dark-glow: #ffcc70;
+  
+  /* Undocumented (Neutral gray) */
+  --undocumented-light: #888888;
+  --undocumented-dark: #999999;
+  
+  /* Outdated (Warning - yellow tinted) */
+  --outdated-light: #6699ee;
+  --outdated-dark: #cc9944;
+  
+  /* Deprecated (Error - red tinted) */
+  --deprecated-light: #cc6666;
+  --deprecated-dark: #dd8866;
+  
   /* RGB versions for alpha transparency */
   --text-color-rgb: 0, 0, 0;
   --classification-1-light-rgb: 119, 119, 153;
@@ -39,6 +58,16 @@
   --classification-4-dark-rgb: 230, 169, 67;
   --classification-5-light-rgb: 140, 180, 255;
   --classification-5-dark-rgb: 255, 183, 76;
+  
+  /* File Status RGB versions */
+  --documented-light-rgb: 140, 180, 255;
+  --documented-dark-rgb: 255, 183, 76;
+  --undocumented-light-rgb: 136, 136, 136;
+  --undocumented-dark-rgb: 153, 153, 153;
+  --outdated-light-rgb: 102, 153, 238;
+  --outdated-dark-rgb: 204, 153, 68;
+  --deprecated-light-rgb: 204, 102, 102;
+  --deprecated-dark-rgb: 221, 136, 102;
 }
 
 * {

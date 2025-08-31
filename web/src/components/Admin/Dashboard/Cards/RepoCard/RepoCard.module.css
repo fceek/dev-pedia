@@ -1,0 +1,438 @@
+.repoCard {
+    width: 32rem;
+    height: 20.5rem;
+    background: #f8f8f6;
+    border: 0.125rem solid var(--border-color);
+    position: relative;
+    font-family: 'Google Sans Code', monospace;
+    box-shadow: 
+        0.25rem 0.25rem 0 rgba(0, 0, 0, 0.1),
+        0.5rem 0.5rem 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    grid-column: span 2; /* Span 2 columns in the grid */
+}
+
+.repoCard:hover {
+    transform: translate(-0.125rem, -0.125rem);
+    box-shadow: 
+        0.375rem 0.375rem 0 rgba(0, 0, 0, 0.15),
+        0.625rem 0.625rem 0 rgba(0, 0, 0, 0.08);
+}
+
+/* Dark theme */
+.repoCard.dark {
+    background: #1a1a18;
+    box-shadow: 
+        0.25rem 0.25rem 0 rgba(255, 255, 255, 0.08),
+        0.5rem 0.5rem 0 rgba(255, 255, 255, 0.04);
+}
+
+.repoCard.dark:hover {
+    box-shadow: 
+        0.375rem 0.375rem 0 rgba(255, 255, 255, 0.12),
+        0.625rem 0.625rem 0 rgba(255, 255, 255, 0.06);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.875rem 1rem 0.75rem;
+    border-bottom: 0.0625rem solid var(--border-color);
+}
+
+.typeLabel {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.125rem;
+    color: var(--classification-4-light);
+}
+
+.repoCard.dark .typeLabel {
+    color: var(--classification-4-dark);
+}
+
+.pageIndicator {
+    display: flex;
+    gap: 0.375rem;
+    align-items: center;
+}
+
+.dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--text-color);
+    opacity: 0.3;
+    transition: all 0.2s ease;
+}
+
+.dot.active {
+    opacity: 0.8;
+    background: var(--classification-4-light);
+    box-shadow: 0 0 0.25rem rgba(var(--classification-4-light-rgb), 0.4);
+}
+
+.dot.addPage {
+    background: transparent;
+    border: 0.0625rem solid var(--text-color);
+    opacity: 0.6;
+}
+
+.dot.addPage.active {
+    border-color: var(--classification-4-light);
+    background: transparent;
+    box-shadow: 0 0 0.25rem rgba(var(--classification-4-light-rgb), 0.3);
+}
+
+.repoCard.dark .dot.active {
+    background: var(--classification-4-dark);
+    box-shadow: 0 0 0.25rem rgba(var(--classification-4-dark-rgb), 0.4);
+}
+
+.repoCard.dark .dot.addPage.active {
+    border-color: var(--classification-4-dark);
+    box-shadow: 0 0 0.25rem rgba(var(--classification-4-dark-rgb), 0.3);
+}
+
+.cardContent {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.mainContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+    position: relative;
+}
+
+.repoInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.repoName {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-color);
+    font-family: 'Google Sans Code', monospace;
+    letter-spacing: -0.025rem;
+}
+
+.repoDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.repoUrl {
+    font-size: 0.625rem;
+    font-weight: 500;
+    color: var(--classification-3-light);
+    font-family: 'Google Sans Code', monospace;
+}
+
+.repoCard.dark .repoUrl {
+    color: var(--classification-3-dark);
+}
+
+.repoUrl a {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.repoUrl a:hover {
+    opacity: 0.8;
+}
+
+.repoBranch {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.branchLabel {
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.125rem;
+    color: var(--text-color);
+    opacity: 0.6;
+    text-transform: uppercase;
+}
+
+.branchName {
+    font-size: 0.625rem;
+    font-weight: 600;
+    color: var(--classification-2-light);
+    font-family: 'Google Sans Code', monospace;
+    padding: 0.125rem 0.375rem;
+    border: 0.0625rem solid var(--classification-2-light);
+    background: rgba(var(--classification-2-light-rgb), 0.1);
+}
+
+.repoCard.dark .branchName {
+    color: var(--classification-2-dark);
+    border-color: var(--classification-2-dark);
+    background: rgba(var(--classification-2-dark-rgb), 0.1);
+}
+
+/* Disk Fragment Visualization */
+.diskFragmentContainer {
+    position: relative;
+    width: 100%;
+    height: 6.5rem;
+}
+
+.diskFragmentBar {
+    display: flex;
+    width: 100%;
+    height: 1rem;
+    border: 0.0625rem solid rgba(var(--text-color-rgb), 0.2);
+    overflow: visible;
+    position: absolute;
+    bottom: 0;
+}
+
+.fragmentSection {
+    position: relative;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.fragmentSection:hover {
+    filter: brightness(1.1);
+}
+
+/* File Status Colors */
+.fragmentSection.documented {
+    background: var(--documented-light);
+    box-shadow: 
+        inset 0 0 0.5rem rgba(var(--documented-light-rgb), 0.3),
+        0 0 0.25rem rgba(var(--documented-light-rgb), 0.2);
+}
+
+.repoCard.dark .fragmentSection.documented {
+    background: var(--documented-dark);
+    box-shadow: 
+        inset 0 0 0.5rem rgba(var(--documented-dark-rgb), 0.3),
+        0 0 0.25rem rgba(var(--documented-dark-rgb), 0.2);
+}
+
+.fragmentSection.undocumented {
+    background: var(--undocumented-light);
+}
+
+.repoCard.dark .fragmentSection.undocumented {
+    background: var(--undocumented-dark);
+}
+
+.fragmentSection.outdated {
+    background: var(--outdated-light);
+}
+
+.repoCard.dark .fragmentSection.outdated {
+    background: var(--outdated-dark);
+}
+
+.fragmentSection.deprecated {
+    background: var(--deprecated-light);
+}
+
+.repoCard.dark .fragmentSection.deprecated {
+    background: var(--deprecated-dark);
+}
+
+/* Vertical Lines and Captions */
+.fragmentLine {
+    position: absolute;
+    right: -0.03125rem; /* Half of line width for centering */
+    width: 0.0625rem;
+    background: var(--text-color);
+    opacity: 0.6;
+}
+
+/* Staggered line heights to match captions */
+.line1 {
+    top: -1.25rem;
+    height: 1.25rem;
+}
+
+.line2 {
+    top: -2.25rem;
+    height: 2.25rem;
+}
+
+.line3 {
+    top: -3.25rem;
+    height: 3.25rem;
+}
+
+.line4 {
+    top: -4.25rem;
+    height: 4.25rem;
+}
+
+.fragmentCaption {
+    position: absolute;
+    display: flex;
+    right: 0.25rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.25rem;
+    width: 6rem;
+    justify-content: flex-end;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+/* Staggered caption heights to prevent overlap */
+.caption1 {
+    top: -1.5rem;
+}
+
+.caption2 {
+    top: -2.5rem;
+}
+
+.caption3 {
+    top: -3.5rem;
+}
+
+.caption4 {
+    top: -4.5rem;
+}
+
+.captionText {
+    font-size: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.0625rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    text-transform: uppercase;
+    font-family: 'Google Sans Code', monospace;
+    white-space: nowrap;
+}
+
+.captionCount {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: currentColor;
+    font-family: 'Google Sans Code', monospace;
+}
+
+.navButton {
+    width: 2rem;
+    border: none;
+    background: rgba(var(--text-color-rgb), 0.05);
+    color: var(--text-color);
+    font-size: 1.5rem;
+    font-weight: 300;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Google Sans Code', monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+}
+
+.prevButton {
+    border-right: 0.0625rem solid rgba(var(--text-color-rgb), 0.1);
+}
+
+.nextButton {
+    border-left: 0.0625rem solid rgba(var(--text-color-rgb), 0.1);
+}
+
+.navButton:hover:not(:disabled) {
+    background: rgba(var(--text-color-rgb), 0.1);
+    opacity: 1;
+}
+
+.navButton:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+    background: rgba(var(--text-color-rgb), 0.02);
+}
+
+.repoCard.dark .navButton {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.repoCard.dark .navButton:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.repoCard.dark .navButton:disabled {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.totalFiles {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.125rem;
+    margin-top: auto;
+}
+
+.filesCount {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-color);
+    font-family: 'Google Sans Code', monospace;
+}
+
+.filesLabel {
+    font-size: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.125rem;
+    color: var(--text-color);
+    opacity: 0.6;
+    text-transform: uppercase;
+    font-family: 'Google Sans Code', monospace;
+}
+
+/* Add New Repo Page */
+.addRepoPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 1rem;
+}
+
+.addRepoIcon {
+    font-size: 3rem;
+    font-weight: 300;
+    color: var(--classification-3-light);
+    opacity: 0.6;
+    line-height: 1;
+}
+
+.repoCard.dark .addRepoIcon {
+    color: var(--classification-3-dark);
+}
+
+.addRepoText {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-color);
+    opacity: 0.7;
+    font-family: 'Google Sans Code', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.0625rem;
+}
+
+.repoCard.dark {
+    --text-color-rgb: 255, 255, 255;
+}

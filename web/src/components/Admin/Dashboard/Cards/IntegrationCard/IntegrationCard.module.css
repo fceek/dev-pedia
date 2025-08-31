@@ -1,0 +1,497 @@
+.integrationCard {
+    width: 18rem;
+    height: 16rem;
+    background: #f8f8f6;
+    border: 0.125rem solid var(--border-color);
+    position: relative;
+    font-family: 'Google Sans Code', monospace;
+    box-shadow: 
+        0.25rem 0.25rem 0 rgba(0, 0, 0, 0.1),
+        0.5rem 0.5rem 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.integrationCard:hover {
+    transform: translate(-0.125rem, -0.125rem);
+    box-shadow: 
+        0.375rem 0.375rem 0 rgba(0, 0, 0, 0.15),
+        0.625rem 0.625rem 0 rgba(0, 0, 0, 0.08);
+}
+
+/* Dark theme */
+.integrationCard.dark {
+    background: #1a1a18;
+    box-shadow: 
+        0.25rem 0.25rem 0 rgba(255, 255, 255, 0.08),
+        0.5rem 0.5rem 0 rgba(255, 255, 255, 0.04);
+}
+
+.integrationCard.dark:hover {
+    box-shadow: 
+        0.375rem 0.375rem 0 rgba(255, 255, 255, 0.12),
+        0.625rem 0.625rem 0 rgba(255, 255, 255, 0.06);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.875rem 1rem 0.75rem;
+    border-bottom: 0.0625rem solid var(--border-color);
+}
+
+.typeLabel {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.125rem;
+    color: var(--classification-4-light);
+}
+
+.integrationCard.dark .typeLabel {
+    color: var(--classification-4-dark);
+}
+
+.cardContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    padding: 1rem 1rem 0.75rem;
+}
+
+.connectionSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.connectionInfo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.fieldLabel {
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.125rem;
+    color: var(--text-color);
+    opacity: 0.6;
+    text-transform: uppercase;
+}
+
+.fieldValue {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-color);
+    font-family: 'Google Sans Code', monospace;
+    letter-spacing: 0.025rem;
+}
+
+.connectedInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.accountInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.0625rem;
+}
+
+.accountType {
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.0625rem;
+    color: var(--classification-3-light);
+    text-transform: uppercase;
+}
+
+.integrationCard.dark .accountType {
+    color: var(--classification-3-dark);
+}
+
+.accountName {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-color);
+    font-family: 'Google Sans Code', monospace;
+}
+
+/* Indicator Container */
+.indicatorContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+/* NASA-Style Status Indicator (Diode/Vacuum Tube) */
+.statusIndicator {
+    position: relative;
+    width: 2.25rem;
+    height: 2.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.05));
+    border: 0.125rem solid rgba(var(--text-color-rgb), 0.2);
+    box-shadow: 
+        inset 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1),
+        0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+}
+
+.integrationCard.dark .statusIndicator {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    box-shadow: 
+        inset 0 0.125rem 0.25rem rgba(255, 255, 255, 0.05),
+        0 0.125rem 0.25rem rgba(0, 0, 0, 0.3);
+}
+
+.indicatorCore {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    position: relative;
+    z-index: 2;
+    transition: all 0.4s ease;
+    box-shadow: 
+        inset 0 0 0.25rem rgba(0, 0, 0, 0.3),
+        0 0 0.125rem rgba(0, 0, 0, 0.2);
+}
+
+.indicatorGlow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.4s ease;
+    opacity: 0;
+    z-index: 1;
+}
+
+/* Indicator Caption */
+.indicatorCaption {
+    font-size: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.0625rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    text-transform: uppercase;
+    font-family: 'Google Sans Code', monospace;
+    text-align: center;
+    width: 4rem;
+    height: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Connection Status States */
+.statusIndicator.sync .indicatorCore {
+    background: linear-gradient(135deg, #777, #555);
+    border: 0.0625rem solid #666;
+}
+
+.statusIndicator.sync .indicatorGlow {
+    background: radial-gradient(circle, rgba(119, 119, 119, 0.4), transparent);
+    box-shadow: 0 0 0.5rem rgba(119, 119, 119, 0.2);
+    opacity: 0.5;
+}
+
+.statusIndicator.disconnected .indicatorCore {
+    background: linear-gradient(135deg, #555, #333);
+    border: 0.0625rem solid #222;
+}
+
+.statusIndicator.disconnected .indicatorGlow {
+    background: radial-gradient(circle, rgba(85, 85, 85, 0.6), transparent);
+    box-shadow: 0 0 0.5rem rgba(85, 85, 85, 0.3);
+    opacity: 0.3;
+}
+
+.statusIndicator.synced .indicatorCore {
+    background: linear-gradient(135deg, var(--classification-2-light), var(--classification-3-light));
+    border: 0.0625rem solid var(--classification-2-light);
+    animation: syncedPulse 2s ease-in-out infinite;
+}
+
+.statusIndicator.synced .indicatorGlow {
+    background: radial-gradient(circle, rgba(var(--classification-2-light-rgb), 0.8), transparent);
+    box-shadow: 
+        0 0 1rem rgba(var(--classification-2-light-rgb), 0.6),
+        0 0 2rem rgba(var(--classification-2-light-rgb), 0.3);
+    opacity: 0.9;
+    animation: syncedGlow 2s ease-in-out infinite;
+}
+
+.integrationCard.dark .statusIndicator.synced .indicatorCore {
+    background: linear-gradient(135deg, var(--classification-2-dark), var(--classification-3-dark));
+    border-color: var(--classification-2-dark);
+}
+
+.integrationCard.dark .statusIndicator.synced .indicatorGlow {
+    background: radial-gradient(circle, rgba(var(--classification-2-dark-rgb), 0.8), transparent);
+    box-shadow: 
+        0 0 1rem rgba(var(--classification-2-dark-rgb), 0.6),
+        0 0 2rem rgba(var(--classification-2-dark-rgb), 0.3);
+}
+
+.statusIndicator.error .indicatorCore {
+    background: linear-gradient(135deg, #cc4444, #aa2222);
+    border: 0.0625rem solid #cc4444;
+    animation: errorFlash 1s ease-in-out infinite;
+}
+
+.statusIndicator.error .indicatorGlow {
+    background: radial-gradient(circle, rgba(204, 68, 68, 0.8), transparent);
+    box-shadow: 
+        0 0 1rem rgba(204, 68, 68, 0.6),
+        0 0 2rem rgba(204, 68, 68, 0.3);
+    opacity: 0.9;
+    animation: errorGlow 1s ease-in-out infinite;
+}
+
+.statusIndicator.syncing .indicatorCore {
+    background: linear-gradient(135deg, var(--classification-4-light), var(--classification-5-light));
+    border: 0.0625rem solid var(--classification-4-light);
+    animation: syncingPulse 0.8s ease-in-out infinite;
+}
+
+.statusIndicator.syncing .indicatorGlow {
+    background: radial-gradient(circle, rgba(var(--classification-4-light-rgb), 0.8), transparent);
+    box-shadow: 
+        0 0 1rem rgba(var(--classification-4-light-rgb), 0.6),
+        0 0 2rem rgba(var(--classification-4-light-rgb), 0.3);
+    opacity: 1;
+    animation: syncingGlow 0.8s ease-in-out infinite;
+}
+
+.integrationCard.dark .statusIndicator.syncing .indicatorCore {
+    background: linear-gradient(135deg, var(--classification-4-dark), var(--classification-5-dark));
+    border-color: var(--classification-4-dark);
+}
+
+.integrationCard.dark .statusIndicator.syncing .indicatorGlow {
+    background: radial-gradient(circle, rgba(var(--classification-4-dark-rgb), 0.8), transparent);
+    box-shadow: 
+        0 0 1rem rgba(var(--classification-4-dark-rgb), 0.6),
+        0 0 2rem rgba(var(--classification-4-dark-rgb), 0.3);
+}
+
+/* Animations */
+@keyframes syncedPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes syncedGlow {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; }
+}
+
+@keyframes errorFlash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+@keyframes errorGlow {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.5; }
+}
+
+@keyframes syncingPulse {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.1); }
+    50% { transform: scale(0.95); }
+    75% { transform: scale(1.05); }
+}
+
+@keyframes syncingGlow {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    25% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.8; }
+    50% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.6; }
+    75% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.9; }
+}
+
+.syncSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.syncStats {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+}
+
+.syncedCount {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-color);
+    font-family: 'Google Sans Code', monospace;
+    letter-spacing: -0.025rem;
+}
+
+.separator {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--text-color);
+    opacity: 0.4;
+    margin: 0 0.125rem;
+}
+
+.totalCount {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-color);
+    opacity: 0.6;
+    font-family: 'Google Sans Code', monospace;
+}
+
+/* Pie Chart Coverage Indicator */
+.pieChartContainer {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    width: 4.5rem;
+    height: 5rem;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.pieChart {
+    width: 4.5rem;
+    height: 4.5rem;
+    transform: rotate(0deg);
+    filter: drop-shadow(0 0.125rem 0.25rem rgba(0, 0, 0, 0.1));
+}
+
+.integrationCard.dark .pieChart {
+    filter: drop-shadow(0 0.125rem 0.25rem rgba(0, 0, 0, 0.3));
+}
+
+.pieBackground {
+    opacity: 0.15;
+    color: var(--text-color);
+}
+
+.pieFill {
+    transition: stroke-dasharray 0.5s ease, stroke 0.3s ease;
+    stroke-linecap: round;
+}
+
+/* Pie chart status colors */
+.pieFill.low {
+    color: var(--classification-2-light);
+    filter: drop-shadow(0 0 0.25rem rgba(var(--classification-2-light-rgb), 0.4));
+}
+
+.pieFill.medium {
+    color: var(--classification-3-light);
+    filter: drop-shadow(0 0 0.25rem rgba(var(--classification-3-light-rgb), 0.4));
+}
+
+.pieFill.high {
+    color: var(--classification-4-light);
+    filter: drop-shadow(0 0 0.25rem rgba(var(--classification-4-light-rgb), 0.4));
+}
+
+.pieFill.full {
+    color: var(--classification-5-light);
+    filter: drop-shadow(0 0 0.25rem rgba(var(--classification-5-light-rgb), 0.4));
+}
+
+.integrationCard.dark .pieFill.low {
+    color: var(--classification-2-dark);
+    filter: drop-shadow(0 0 0.25rem rgba(var(--classification-2-dark-rgb), 0.4));
+}
+
+.integrationCard.dark .pieFill.medium {
+    color: var(--classification-3-dark);
+    filter: drop-shadow(0 0 0.25rem rgba(var(--classification-3-dark-rgb), 0.4));
+}
+
+.integrationCard.dark .pieFill.high {
+    color: var(--classification-4-dark);
+    filter: drop-shadow(0 0 0.25rem rgba(var(--classification-4-dark-rgb), 0.4));
+}
+
+.integrationCard.dark .pieFill.full {
+    color: var(--classification-5-dark);
+    filter: drop-shadow(0 0 0.25rem rgba(var(--classification-5-dark-rgb), 0.4));
+}
+
+.pieText {
+    font-size: 0.625rem;
+    font-weight: 700;
+    font-family: 'Google Sans Code', monospace;
+    fill: var(--text-color);
+    opacity: 0.8;
+    letter-spacing: -0.025rem;
+}
+
+.pieCaption {
+    font-size: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.0625rem;
+    color: var(--text-color);
+    opacity: 0.6;
+    text-transform: uppercase;
+    font-family: 'Google Sans Code', monospace;
+    text-align: center;
+}
+
+.lastSyncSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 0.375rem;
+}
+
+.actionButton {
+    padding: 0.25rem 0.5rem;
+    border: 0.0625rem solid var(--border-color);
+    background: var(--accent-color);
+    color: var(--text-color);
+    font-size: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Google Sans Code', monospace;
+    letter-spacing: 0.0625rem;
+    text-transform: uppercase;
+}
+
+.actionButton:hover:not(:disabled) {
+    background: var(--text-color);
+    color: var(--accent-color);
+}
+
+.actionButton:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.integrationCard.dark {
+    --text-color-rgb: 255, 255, 255;
+}
