@@ -125,6 +125,11 @@ definitions:
         $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.ArticleMetadata'
       parent_path:
         type: string
+      secrets:
+        description: 'New: secrets to create with article'
+        items:
+          $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.CreateContentSecretRequest'
+        type: array
       slug:
         maxLength: 100
         type: string
@@ -154,6 +159,25 @@ definitions:
     - full_path
     - source_type
     - title
+    type: object
+  fceek_dev-pedia_backend_internal_models.CreateContentSecretRequest:
+    properties:
+      classification_level:
+        maximum: 5
+        minimum: 2
+        type: integer
+      content:
+        type: string
+      description:
+        maxLength: 500
+        type: string
+      secret_key:
+        maxLength: 100
+        type: string
+    required:
+    - classification_level
+    - content
+    - secret_key
     type: object
   fceek_dev-pedia_backend_internal_models.CreateTokenRequest:
     properties:
@@ -209,6 +233,11 @@ definitions:
         $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.ArticleMetadata'
       parent_path:
         type: string
+      secrets:
+        description: 'New: replace all secrets with this list'
+        items:
+          $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.CreateContentSecretRequest'
+        type: array
       slug:
         maxLength: 100
         type: string

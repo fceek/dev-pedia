@@ -12,3 +12,46 @@
     gap: 5rem 2rem;
     align-items: start;
 }
+
+/* Custom scrollbar styling */
+.dashboard::-webkit-scrollbar {
+    width: 0.5rem;
+}
+
+.dashboard::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.dashboard::-webkit-scrollbar-thumb {
+    background: radial-gradient(
+        ellipse at right center,
+        var(--classification-1-light) 0%,
+        transparent 60%
+    );
+    border-radius: 2px;
+}
+
+.dashboard::-webkit-scrollbar-thumb:hover {
+    background: radial-gradient(
+        ellipse at right center,
+        var(--classification-1-light) 0%,
+        transparent 70%
+    );
+}
+
+/* Dark theme scrollbar */
+.dashboard.dark::-webkit-scrollbar-thumb {
+    background: radial-gradient(
+        ellipse at right center,
+        var(--classification-1-dark) 0%,
+        transparent 60%
+    );
+}
+
+.dashboard.dark::-webkit-scrollbar-thumb:hover {
+    background: radial-gradient(
+        ellipse at right center,
+        var(--classification-1-dark) 0%,
+        transparent 70%
+    );
+}

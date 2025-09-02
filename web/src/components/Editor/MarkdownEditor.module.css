@@ -1,0 +1,412 @@
+/* MarkdownEditor Component Styles */
+
+.editorContainer {
+  width: 100%;
+  border: 0.125rem solid var(--border-color);
+  background: var(--accent-color);
+  font-family: 'Google Sans Code', monospace;
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.editorContainer.dark {
+  background: #1a1a18;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--bg-color);
+  border-bottom: 0.0625rem solid var(--border-color);
+  min-height: 3rem;
+}
+
+.toolbarLeft {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.toolbarRight {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.toolButton {
+  padding: 0.5rem 0.75rem;
+  border: 0.0625rem solid var(--border-color);
+  background: var(--accent-color);
+  color: var(--text-color);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Google Sans Code', monospace;
+  border-radius: 0.25rem;
+}
+
+.toolButton.active {
+  background: var(--classification-4-light);
+  color: white;
+  border-color: var(--classification-4-light);
+}
+
+.toolButton.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.toolButton.active:hover {
+  background: var(--classification-4-light-shadow);
+  border-color: var(--classification-4-light-shadow);
+}
+
+.toolButton.disabled:hover {
+  background: var(--accent-color);
+  border-color: var(--border-color);
+}
+
+.secretCount {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-color);
+  opacity: 0.7;
+  letter-spacing: 0.05rem;
+}
+
+/* Editor */
+.editorWrapper {
+  position: relative;
+  min-height: 400px;
+}
+
+.editor {
+  width: 100%;
+  min-height: 400px;
+  padding: 1.5rem;
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  font-family: 'Google Sans Code', monospace;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  z-index: 2;
+  position: relative;
+}
+
+.editor::placeholder {
+  color: var(--text-color);
+  opacity: 0.5;
+}
+
+/* Highlight overlay for secret placeholders */
+.highlightOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 1.5rem;
+  pointer-events: none;
+  z-index: 1;
+  font-family: 'Google Sans Code', monospace;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: transparent;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: hidden;
+}
+
+.line {
+  display: block;
+}
+
+.normalText {
+  color: transparent;
+}
+
+.secretPlaceholder {
+  background: var(--classification-2-light);
+  color: white;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  pointer-events: all;
+  transition: all 0.2s ease;
+  margin: 0 0.125rem;
+}
+
+.secretPlaceholder:hover {
+  opacity: 0.9;
+}
+
+.secretPlaceholder.level2 { background: var(--classification-2-light); }
+.secretPlaceholder.level3 { background: var(--classification-3-light); }
+.secretPlaceholder.level4 { background: var(--classification-4-light); }
+.secretPlaceholder.level5 { background: var(--classification-5-light); }
+
+.editorContainer.dark .secretPlaceholder.level2 { background: var(--classification-2-dark); }
+.editorContainer.dark .secretPlaceholder.level3 { background: var(--classification-3-dark); }
+.editorContainer.dark .secretPlaceholder.level4 { background: var(--classification-4-dark); }
+.editorContainer.dark .secretPlaceholder.level5 { background: var(--classification-5-dark); }
+
+/* Secrets List */
+.secretsList {
+  padding: 1rem;
+  border-top: 0.0625rem solid var(--border-color);
+  background: var(--bg-color);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.secretsList h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-color);
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+}
+
+.secrets {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.secretItem {
+  padding: 0.75rem;
+  border: 0.0625rem solid var(--border-color);
+  border-radius: 0.25rem;
+  background: var(--accent-color);
+  border-left-width: 0.25rem;
+}
+
+.secretItem.level2 { border-left-color: var(--classification-2-light); }
+.secretItem.level3 { border-left-color: var(--classification-3-light); }
+.secretItem.level4 { border-left-color: var(--classification-4-light); }
+.secretItem.level5 { border-left-color: var(--classification-5-light); }
+
+.editorContainer.dark .secretItem.level2 { border-left-color: var(--classification-2-dark); }
+.editorContainer.dark .secretItem.level3 { border-left-color: var(--classification-3-dark); }
+.editorContainer.dark .secretItem.level4 { border-left-color: var(--classification-4-dark); }
+.editorContainer.dark .secretItem.level5 { border-left-color: var(--classification-5-dark); }
+
+.secretHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.secretKey {
+  font-family: 'Google Sans Code', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-color);
+  background: var(--bg-color);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.1875rem;
+  border: 0.0625rem solid var(--border-color);
+}
+
+.secretLevel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-color);
+  opacity: 0.7;
+  letter-spacing: 0.05rem;
+}
+
+.secretActions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.editButton,
+.deleteButton {
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.1875rem;
+  transition: all 0.2s ease;
+}
+
+.editButton:hover {
+  background: var(--classification-3-light);
+}
+
+.deleteButton:hover {
+  background: #ff6b6b;
+}
+
+.secretDescription {
+  font-size: 0.8125rem;
+  color: var(--text-color);
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.secretContent {
+  font-size: 0.8125rem;
+  color: var(--text-color);
+  background: var(--bg-color);
+  padding: 0.5rem;
+  border-radius: 0.1875rem;
+  border: 0.0625rem solid var(--border-color);
+  font-family: 'Google Sans Code', monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Modal */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+.modal {
+  background: var(--accent-color);
+  border: 0.125rem solid var(--border-color);
+  border-radius: 0.5rem;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  font-family: 'Google Sans Code', monospace;
+}
+
+.modal.dark {
+  background: #1a1a18;
+}
+
+.modal h3 {
+  margin: 0 0 1.5rem 0;
+  color: var(--text-color);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.formGroup {
+  margin-bottom: 1.25rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-color);
+  letter-spacing: 0.025rem;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 0.0625rem solid var(--border-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-family: 'Google Sans Code', monospace;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--classification-4-light);
+  box-shadow: 0 0 0 0.1875rem rgba(119, 170, 255, 0.2);
+}
+
+.modal.dark .input:focus,
+.modal.dark .select:focus,
+.modal.dark .textarea:focus {
+  border-color: var(--classification-4-dark);
+  box-shadow: 0 0 0 0.1875rem rgba(230, 169, 67, 0.2);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 4rem;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 0.0625rem solid var(--border-color);
+}
+
+.cancelButton,
+.saveButton {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: 'Google Sans Code', monospace;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 0.0625rem solid var(--border-color);
+}
+
+.cancelButton {
+  background: var(--accent-color);
+  color: var(--text-color);
+}
+
+.cancelButton:hover {
+  background: var(--bg-color);
+}
+
+.saveButton {
+  background: var(--classification-4-light);
+  color: white;
+  border-color: var(--classification-4-light);
+}
+
+.saveButton:hover {
+  background: var(--classification-4-light-shadow);
+  border-color: var(--classification-4-light-shadow);
+}
+
+.saveButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.modal.dark .saveButton {
+  background: var(--classification-4-dark);
+  border-color: var(--classification-4-dark);
+}
+
+.modal.dark .saveButton:hover {
+  background: var(--classification-4-dark-shadow);
+  border-color: var(--classification-4-dark-shadow);
+}

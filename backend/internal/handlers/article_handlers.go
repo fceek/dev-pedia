@@ -56,7 +56,7 @@ func (h *ArticleHandler) CreateArticle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	article, err := h.articleService.Create(&req, &token.ID)
+	article, err := h.articleService.Create(&req, token)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -120,8 +120,15 @@ func (h *ArticleHandler) GetArticle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Process content with classification-based secret filtering
+	processedArticle, err := h.articleService.ProcessContentForUser(&article.Article, token, r.RemoteAddr, r.UserAgent())
+	if err != nil {
+		http.Error(w, "Failed to process article content", http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(article)
+	json.NewEncoder(w).Encode(processedArticle)
 }
 
 // @Summary Get article by path
@@ -175,8 +182,15 @@ func (h *ArticleHandler) GetArticleByPath(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	// Process content with classification-based secret filtering
+	processedArticle, err := h.articleService.ProcessContentForUser(&article.Article, token, r.RemoteAddr, r.UserAgent())
+	if err != nil {
+		http.Error(w, "Failed to process article content", http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(article)
+	json.NewEncoder(w).Encode(processedArticle)
 }
 
 // @Summary List articles
@@ -318,7 +332,7 @@ func (h *ArticleHandler) UpdateArticle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	article, err := h.articleService.Update(sourceType, id, &req, &token.ID)
+	article, err := h.articleService.Update(sourceType, id, &req, token)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

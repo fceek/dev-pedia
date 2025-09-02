@@ -18,8 +18,8 @@ func NewArticleService(db *sql.DB) *ArticleService {
 	return &ArticleService{db: db}
 }
 
-// Create creates a new article
-func (s *ArticleService) Create(req *models.CreateArticleRequest, createdBy *uuid.UUID) (*models.Article, error) {
+// Create creates a new article with optional content secrets
+func (s *ArticleService) Create(req *models.CreateArticleRequest, userToken *models.Token) (*models.Article, error) {
 	tx, err := s.db.Begin()
 	if err != nil {
 		return nil, fmt.Errorf("failed to begin transaction: %w", err)
@@ -47,9 +47,9 @@ func (s *ArticleService) Create(req *models.CreateArticleRequest, createdBy *uui
 		ClassificationLevel: req.ClassificationLevel,
 		Status:              status,
 		Metadata:            req.Metadata,
-		CreatedBy:           createdBy,
+		CreatedBy:           &userToken.ID,
 		CreatedAt:           time.Now(),
-		UpdatedBy:           createdBy,
+		UpdatedBy:           &userToken.ID,
 		UpdatedAt:           time.Now(),
 	}
 
@@ -74,7 +74,7 @@ func (s *ArticleService) Create(req *models.CreateArticleRequest, createdBy *uui
 		                             content, metadata, change_summary, created_by, created_at)
 		VALUES ($1, $2, 1, $3, $4, $5, $6, $7, $8)
 	`, articleID, req.SourceType, req.Title, req.Content, req.Metadata, 
-		"Initial version", createdBy, time.Now())
+		"Initial version", &userToken.ID, time.Now())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create article version: %w", err)
 	}
@@ -84,6 +84,14 @@ func (s *ArticleService) Create(req *models.CreateArticleRequest, createdBy *uui
 		err = s.addTagsToArticle(tx, articleID, req.SourceType, req.TagIDs)
 		if err != nil {
 			return nil, fmt.Errorf("failed to add tags: %w", err)
+		}
+	}
+
+	// Add content secrets if provided
+	if len(req.Secrets) > 0 {
+		err = s.addSecretsToArticle(tx, articleID, req.SourceType, req.Secrets, userToken)
+		if err != nil {
+			return nil, fmt.Errorf("failed to add secrets: %w", err)
 		}
 	}
 
@@ -265,9 +273,9 @@ func (s *ArticleService) List(sourceType *models.ArticleSourceType, parentPath *
 	}, nil
 }
 
-// Update updates an existing article
+// Update updates an existing article with optional content secrets
 func (s *ArticleService) Update(sourceType models.ArticleSourceType, id uuid.UUID, 
-	req *models.UpdateArticleRequest, updatedBy *uuid.UUID) (*models.Article, error) {
+	req *models.UpdateArticleRequest, userToken *models.Token) (*models.Article, error) {
 	
 	tx, err := s.db.Begin()
 	if err != nil {
@@ -359,8 +367,8 @@ func (s *ArticleService) Update(sourceType models.ArticleSourceType, id uuid.UUI
 
 	// Always update timestamp and updater
 	updates = append(updates, fmt.Sprintf("updated_by = $%d", argIndex))
-	args = append(args, updatedBy)
-	current.UpdatedBy = updatedBy
+	args = append(args, &userToken.ID)
+	current.UpdatedBy = &userToken.ID
 	argIndex++
 
 	updates = append(updates, fmt.Sprintf("updated_at = $%d", argIndex))
@@ -405,7 +413,7 @@ func (s *ArticleService) Update(sourceType models.ArticleSourceType, id uuid.UUI
 				                             title, content, metadata, change_summary, created_by, created_at)
 				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 			`, id, sourceType, nextVersion, current.Title, current.Content, current.Metadata,
-				*changeSummary, updatedBy, now)
+				*changeSummary, &userToken.ID, now)
 			if err != nil {
 				return nil, fmt.Errorf("failed to create article version: %w", err)
 			}
@@ -428,6 +436,26 @@ func (s *ArticleService) Update(sourceType models.ArticleSourceType, id uuid.UUI
 			err = s.addTagsToArticle(tx, id, sourceType, req.TagIDs)
 			if err != nil {
 				return nil, fmt.Errorf("failed to add tags: %w", err)
+			}
+		}
+	}
+
+	// Update content secrets if provided
+	if req.Secrets != nil {
+		// Remove existing secrets
+		_, err = tx.Exec(`
+			DELETE FROM article_content_secrets 
+			WHERE article_source_type = $1 AND article_id = $2
+		`, sourceType, id)
+		if err != nil {
+			return nil, fmt.Errorf("failed to remove existing secrets: %w", err)
+		}
+
+		// Add new secrets
+		if len(req.Secrets) > 0 {
+			err = s.addSecretsToArticle(tx, id, sourceType, req.Secrets, userToken)
+			if err != nil {
+				return nil, fmt.Errorf("failed to add secrets: %w", err)
 			}
 		}
 	}
@@ -503,4 +531,131 @@ func (s *ArticleService) getArticleTags(sourceType models.ArticleSourceType, art
 	}
 
 	return tags, nil
+}
+
+// addSecretsToArticle adds content secrets to an article with authorization checks
+func (s *ArticleService) addSecretsToArticle(tx *sql.Tx, articleID uuid.UUID, sourceType models.ArticleSourceType, secrets []models.CreateContentSecretRequest, userToken *models.Token) error {
+	for _, secretReq := range secrets {
+		// Authorization check: user can only create secrets at or below their classification level
+		if userToken.ClassificationLevel < secretReq.ClassificationLevel {
+			return fmt.Errorf("insufficient clearance to create secret with classification level %d (user level: %d)", 
+				secretReq.ClassificationLevel, userToken.ClassificationLevel)
+		}
+
+		// Create the secret
+		_, err := tx.Exec(`
+			INSERT INTO article_content_secrets (
+				id, article_id, article_source_type, secret_key, classification_level,
+				content, description, created_by, created_at, updated_by, updated_at
+			) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+		`, uuid.New(), articleID, sourceType, secretReq.SecretKey, secretReq.ClassificationLevel,
+			secretReq.Content, secretReq.Description, &userToken.ID, time.Now(),
+			&userToken.ID, time.Now())
+		if err != nil {
+			return fmt.Errorf("failed to add secret '%s': %w", secretReq.SecretKey, err)
+		}
+	}
+	return nil
+}
+
+// ProcessContentForUser processes article content with classification-based secret filtering
+func (s *ArticleService) ProcessContentForUser(article *models.Article, userToken *models.Token, ipAddress, userAgent string) (*models.ProcessedArticle, error) {
+	// Get all secrets for this article
+	secrets, err := s.getArticleSecrets(article.SourceType, article.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get article secrets: %w", err)
+	}
+	
+	// Create secret mappings with access control
+	secretMappings := []models.SecretMapping{}
+	for _, secret := range secrets {
+		hasAccess := userToken.ClassificationLevel >= secret.ClassificationLevel
+		
+		mapping := models.SecretMapping{
+			SecretKey:           secret.SecretKey,
+			ClassificationLevel: secret.ClassificationLevel,
+			HasAccess:           hasAccess,
+			DeniedMessage:       "[Access Denied]",
+			Description:         secret.Description,
+		}
+		
+		// Only include actual content if user has access
+		if hasAccess {
+			mapping.RevealedContent = &secret.Content
+		}
+		
+		secretMappings = append(secretMappings, mapping)
+		
+		// Log access attempt
+		if userToken != nil {
+			err := s.logSecretAccess(article, secret.SecretKey, userToken, hasAccess, secret.ClassificationLevel, ipAddress, userAgent)
+			if err != nil {
+				// Log error but don't fail the request
+				fmt.Printf("Failed to log secret access: %v\n", err)
+			}
+		}
+	}
+	
+	return &models.ProcessedArticle{
+		Article:             *article,
+		ProcessedContent:    article.Content, // Original content with placeholders intact
+		SecretMappings:      secretMappings,
+		UserClassification:  userToken.ClassificationLevel,
+	}, nil
+}
+
+// getArticleSecrets retrieves all secrets for an article
+func (s *ArticleService) getArticleSecrets(sourceType models.ArticleSourceType, articleID uuid.UUID) ([]models.ContentSecret, error) {
+	query := `
+		SELECT id, article_id, article_source_type, secret_key, classification_level,
+		       content, description, created_by, created_at, updated_by, updated_at
+		FROM article_content_secrets
+		WHERE article_source_type = $1 AND article_id = $2
+		ORDER BY secret_key
+	`
+	
+	rows, err := s.db.Query(query, sourceType, articleID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query article secrets: %w", err)
+	}
+	defer rows.Close()
+	
+	secrets := []models.ContentSecret{}
+	for rows.Next() {
+		secret := models.ContentSecret{}
+		err := rows.Scan(
+			&secret.ID, &secret.ArticleID, &secret.ArticleSourceType,
+			&secret.SecretKey, &secret.ClassificationLevel, &secret.Content,
+			&secret.Description, &secret.CreatedBy, &secret.CreatedAt,
+			&secret.UpdatedBy, &secret.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan secret: %w", err)
+		}
+		secrets = append(secrets, secret)
+	}
+	
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating secrets: %w", err)
+	}
+	
+	return secrets, nil
+}
+
+// logSecretAccess logs an access attempt to a secret for audit purposes
+func (s *ArticleService) logSecretAccess(article *models.Article, secretKey string, userToken *models.Token, accessGranted bool, requiredLevel int, ipAddress, userAgent string) error {
+	query := `
+		INSERT INTO article_secret_access_log (
+			article_id, article_source_type, secret_key, token_id, access_granted,
+			user_classification_level, required_classification_level, ip_address, user_agent, accessed_at
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP)
+	`
+	
+	_, err := s.db.Exec(query, article.ID, article.SourceType, secretKey, userToken.ID,
+		accessGranted, userToken.ClassificationLevel, requiredLevel, ipAddress, userAgent)
+	if err != nil {
+		return fmt.Errorf("failed to log secret access: %w", err)
+	}
+	
+	return nil
 }

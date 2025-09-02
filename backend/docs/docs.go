@@ -1108,6 +1108,13 @@ const docTemplate = `{
                 "parent_path": {
                     "type": "string"
                 },
+                "secrets": {
+                    "description": "New: secrets to create with article",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.CreateContentSecretRequest"
+                    }
+                },
                 "slug": {
                     "type": "string",
                     "maxLength": 100
@@ -1144,6 +1151,32 @@ const docTemplate = `{
                 "title": {
                     "type": "string",
                     "maxLength": 200
+                }
+            }
+        },
+        "fceek_dev-pedia_backend_internal_models.CreateContentSecretRequest": {
+            "type": "object",
+            "required": [
+                "classification_level",
+                "content",
+                "secret_key"
+            ],
+            "properties": {
+                "classification_level": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 2
+                },
+                "content": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "secret_key": {
+                    "type": "string",
+                    "maxLength": 100
                 }
             }
         },
@@ -1224,6 +1257,13 @@ const docTemplate = `{
                 },
                 "parent_path": {
                     "type": "string"
+                },
+                "secrets": {
+                    "description": "New: replace all secrets with this list",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.CreateContentSecretRequest"
+                    }
                 },
                 "slug": {
                     "type": "string",

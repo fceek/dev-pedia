@@ -13,6 +13,7 @@ interface ArticleStats {
   lastContributionDays: number
 }
 
+
 export default function ArticleCard() {
   const { user, classificationLevel, loadArticleStats } = useAuth()
   const { isDark, getConditionalClass } = useTheme()
