@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import ReactMarkdown from 'react-markdown'
+import { useState, useEffect } from 'react'
 import { MarkdownHooks } from "react-markdown"
 import remarkGfm from 'remark-gfm'
 import rehypeStarryNight from 'rehype-starry-night'
