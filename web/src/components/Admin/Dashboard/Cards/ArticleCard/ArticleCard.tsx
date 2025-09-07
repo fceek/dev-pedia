@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
+import ArticleEditor from '@/components/Editor/ArticleEditor'
 import styles from './ArticleCard.module.css'
 
 interface ArticleStats {
@@ -13,8 +14,15 @@ interface ArticleStats {
   lastContributionDays: number
 }
 
+interface ArticleCardProps {
+  isExpanded?: boolean
+  onExpand?: () => void
+}
 
-export default function ArticleCard() {
+export default function ArticleCard({ 
+  isExpanded = false, 
+  onExpand
+}: ArticleCardProps) {
   const { user, classificationLevel, loadArticleStats } = useAuth()
   const { isDark, getConditionalClass } = useTheme()
   const [articleStats, setArticleStats] = useState<ArticleStats>({
@@ -25,6 +33,7 @@ export default function ArticleCard() {
     lastContributionDays: 0
   })
   const [loading, setLoading] = useState(true)
+  const cardRef = useRef<HTMLDivElement>(null)
   
   // Load article statistics when component mounts
   useEffect(() => {
@@ -77,8 +86,18 @@ export default function ArticleCard() {
   }
 
   const handleCreateArticle = () => {
-    // TODO: Implement create article modal/view
-    console.log('Create article clicked')
+    if (onExpand) {
+      onExpand()
+    }
+  }
+
+  const handleSaveArticle = async (articleData: any) => {
+    // TODO: Implement save logic
+    console.log('Saving article:', articleData)
+  }
+
+  const handleCancelEdit = () => {
+    // Cancel handled by dashboard
   }
 
   const handleListArticles = () => {
@@ -91,8 +110,25 @@ export default function ArticleCard() {
     console.log('View drafts clicked')
   }
 
+  // In expanded mode, render as expanded card content
+  if (isExpanded) {
+    return (
+      <div className={styles.expandedCard}>
+        <ArticleEditor
+          onSave={handleSaveArticle}
+          onCancel={() => {}} // Handled by dashboard
+          className={styles.editorInCard}
+        />
+      </div>
+    )
+  }
+
+  // Normal dashboard mode
   return (
-    <div className={`${styles.articleCard} ${getConditionalClass(styles, 'dark', isDark)}`}>
+    <div 
+      ref={cardRef}
+      className={`${styles.articleCard} ${getConditionalClass(styles, 'dark', isDark)}`}
+    >
       <div className={styles.cardHeader}>
         <div className={styles.typeLabel}>ARTICLES</div>
         <div className={styles.actionButtons}>
@@ -146,7 +182,6 @@ export default function ArticleCard() {
           </div>
         </div>
       </div>
-
     </div>
   )
 }

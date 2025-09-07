@@ -10,12 +10,14 @@ interface HeaderProps {
   breadcrumbs?: string[]
   classificationLevel?: number
   isExpanded?: boolean
+  onBreadcrumbClick?: (item: string) => void
 }
 
 export default function Header({ 
   breadcrumbs, 
   classificationLevel = 2,
-  isExpanded = false
+  isExpanded = false,
+  onBreadcrumbClick
 }: HeaderProps) {
   const pathname = usePathname()
   const generatedBreadcrumbs = generateBreadcrumbsFromPath(pathname, breadcrumbs)
@@ -23,7 +25,7 @@ export default function Header({
   return (
     <header className={`${styles.header} ${isExpanded ? styles.expanded : ''}`}>
       <ClassificationIndicator level={classificationLevel} />
-      <Breadcrumb items={generatedBreadcrumbs} />
+      <Breadcrumb items={generatedBreadcrumbs} onItemClick={onBreadcrumbClick} />
     </header>
   )
 }

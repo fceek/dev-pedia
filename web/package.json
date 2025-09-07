@@ -12,6 +12,9 @@
     "next": "15.5.1",
     "react": "19.1.1",
     "react-dom": "19.1.1",
+    "react-markdown": "^10.1.0",
+    "rehype-starry-night": "^2.2.0",
+    "remark-gfm": "^4.0.1",
     "sass": "^1.90.0"
   },
   "devDependencies": {

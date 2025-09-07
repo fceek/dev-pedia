@@ -10,7 +10,12 @@ interface TokenStats {
   maxAllowed: number
 }
 
-export default function TokenCard() {
+interface CardProps {
+  isExpanded?: boolean
+  isPushedAway?: boolean
+}
+
+export default function TokenCard({ isExpanded = false, isPushedAway = false }: CardProps) {
   const { user, classificationLevel, loadTokenStats } = useAuth()
   const { isDark, getConditionalClass } = useTheme()
   const [tokenStats, setTokenStats] = useState<TokenStats>({ created: 0, maxAllowed: 0 })
@@ -68,7 +73,7 @@ export default function TokenCard() {
   }
 
   return (
-    <div className={`${styles.tokenCard} ${getConditionalClass(styles, 'dark', isDark)}`}>
+    <div className={`${styles.tokenCard} ${getConditionalClass(styles, 'dark', isDark)} ${getConditionalClass(styles, 'pushedAway', isPushedAway)}`}>
       <div className={styles.cardHeader}>
         <div className={styles.typeLabel}>TOKENS</div>
         <div className={styles.actionButtons}>
@@ -116,6 +121,12 @@ export default function TokenCard() {
         </div>
       </div>
 
+      {/* File folder tab hint */}
+      {isPushedAway && (
+        <div className={styles.pushedHint}>
+          <div className={styles.hintLabel}>TOKENS</div>
+        </div>
+      )}
     </div>
   )
 }

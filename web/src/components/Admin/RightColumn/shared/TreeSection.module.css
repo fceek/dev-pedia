@@ -1,0 +1,20 @@
+.branchContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.horizontalBranch {
+    width: 1rem;
+    height: 2px;
+    background: var(--border-color);
+    margin-left: 1rem;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 0.625rem; /* Align with center of section title text */
+}
+
+.treeContent {
+    flex: 1;
+    margin-left: 0.5rem;
+}

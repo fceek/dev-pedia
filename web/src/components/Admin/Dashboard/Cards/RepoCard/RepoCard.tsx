@@ -19,7 +19,12 @@ interface Repository {
   totalFiles: number
 }
 
-export default function RepoCard() {
+interface CardProps {
+  isExpanded?: boolean
+  isPushedAway?: boolean
+}
+
+export default function RepoCard({ isExpanded = false, isPushedAway = false }: CardProps) {
   const { user } = useAuth()
   const { isDark, getConditionalClass } = useTheme()
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -151,7 +156,7 @@ export default function RepoCard() {
   )
 
   return (
-    <div className={`${styles.repoCard} ${getConditionalClass(styles, 'dark', isDark)}`}>
+    <div className={`${styles.repoCard} ${getConditionalClass(styles, 'dark', isDark)} ${getConditionalClass(styles, 'pushedAway', isPushedAway)}`}>
       <div className={styles.cardHeader}>
         <div className={styles.typeLabel}>REPOSITORIES</div>
         <div className={styles.pageIndicator}>
@@ -211,6 +216,13 @@ export default function RepoCard() {
           ›
         </button>
       </div>
+
+      {/* File folder tab hint */}
+      {isPushedAway && (
+        <div className={styles.pushedHint}>
+          <div className={styles.hintLabel}>REPOS</div>
+        </div>
+      )}
     </div>
   )
 }

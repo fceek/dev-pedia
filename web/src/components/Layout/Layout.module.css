@@ -74,5 +74,7 @@
 
 .rightColumn {
     grid-area: rightColumn;
+    min-width: 0;
+    overflow: hidden;
 }
 

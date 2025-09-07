@@ -1,0 +1,58 @@
+.treeArea {
+    position: relative;
+}
+
+.sectionsContainer {
+    position: relative;
+    opacity: 0; /* Always start invisible */
+    transform: translateY(-20px); /* Always start in fade-in position */
+}
+
+.mainVerticalLine {
+    position: absolute;
+    left: 1rem;
+    top: -4rem; /* Connect back to header border */
+    bottom: 4rem;
+    width: 2px;
+    background: var(--border-color);
+    z-index: 1;
+}
+
+/* Tree animations - fade up/down from header */
+.sectionsContainer.fadeOut {
+    opacity: 0;
+    transform: translateY(-20px); /* Fade out towards header */
+    animation: fadeOutUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sectionsContainer.fadeIn {
+    opacity: 1;
+    transform: translateY(0);
+    animation: fadeInDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeOutUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes fadeInDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    1% {
+        opacity: 0; /* Stay invisible for first 1% to override any base visibility */
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,5 +1,6 @@
 /* DEV-Pedia Design System Global Styles */
 @import url('https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&display=swap');
+@import './styles/starry-night.css';
 
 /* DEV-Pedia Color Palette */
 :root {
@@ -68,6 +69,60 @@
   --outdated-dark-rgb: 204, 153, 68;
   --deprecated-light-rgb: 204, 102, 102;
   --deprecated-dark-rgb: 221, 136, 102;
+}
+
+/* Hybrid Theme System: Default to system preference */
+:root {
+  /* Default light theme variables */
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --border-color: #000000;
+  --accent-color: #f5f5f5;
+  --accent-text: #000000;
+}
+
+/* System dark mode preference */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #1a1a1a;
+    --text-color: #ffffff;
+    --border-color: #ffffff;
+    --accent-color: #000000;
+    --accent-text: #ffffff;
+  }
+}
+
+/* Manual theme overrides (higher specificity) */
+body.theme-light {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --border-color: #000000;
+  --accent-color: #f5f5f5;
+  --accent-text: #000000;
+}
+
+body.theme-dark {
+  --bg-color: #1a1a1a;
+  --text-color: #ffffff;
+  --border-color: #ffffff;
+  --accent-color: #000000;
+  --accent-text: #ffffff;
+}
+
+body.theme-admin-light {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --border-color: #000000;
+  --accent-color: #f5f5f5;
+  --accent-text: #000000;
+}
+
+body.theme-admin-dark {
+  --bg-color: #1a1a1a;
+  --text-color: #ffffff;
+  --border-color: #ffffff;
+  --accent-color: #000000;
+  --accent-text: #ffffff;
 }
 
 * {

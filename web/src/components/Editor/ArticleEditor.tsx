@@ -1,6 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { MarkdownHooks } from "react-markdown"
+import remarkGfm from 'remark-gfm'
+import rehypeStarryNight from 'rehype-starry-night'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import MarkdownEditor from './MarkdownEditor'
@@ -13,15 +17,22 @@ interface Secret {
   description?: string
 }
 
+interface ArticleTag {
+  id: string
+  name: string
+  color: string
+  darkColor?: string
+}
+
 interface ArticleData {
   title: string
-  sourceType: 'doc' | 'git'
   fullPath: string
   parentPath?: string
   classificationLevel: number
   status: 'draft' | 'published'
   content: string
   secrets: Secret[]
+  tags: ArticleTag[]
   description?: string
 }
 
@@ -31,6 +42,13 @@ interface ArticleEditorProps {
   onSave?: (data: ArticleData) => Promise<void>
   onCancel?: () => void
   className?: string
+  isImmersive?: boolean
+  onImmersiveToggle?: (immersive: boolean) => void
+  previewMode?: boolean
+  onPreviewToggle?: (preview: boolean) => void
+  status?: 'draft' | 'published'
+  onStatusChange?: (status: 'draft' | 'published') => void
+  onMakeSecret?: (makeSecretFn: () => void) => void
 }
 
 export default function ArticleEditor({
@@ -38,26 +56,80 @@ export default function ArticleEditor({
   isEditing = false,
   onSave,
   onCancel,
-  className = ""
+  className = "",
+  isImmersive = false,
+  onImmersiveToggle,
+  previewMode: externalPreviewMode,
+  onPreviewToggle,
+  status: externalStatus,
+  onStatusChange,
+  onMakeSecret
 }: ArticleEditorProps) {
   const { classificationLevel } = useAuth()
   const { isDark, getConditionalClass } = useTheme()
   
   const [articleData, setArticleData] = useState<ArticleData>({
     title: initialData?.title || '',
-    sourceType: initialData?.sourceType || 'doc',
     fullPath: initialData?.fullPath || '',
     parentPath: initialData?.parentPath || '',
     classificationLevel: initialData?.classificationLevel || Math.min(classificationLevel, 2),
     status: initialData?.status || 'draft',
     content: initialData?.content || '',
     secrets: initialData?.secrets || [],
+    tags: initialData?.tags || [],
     description: initialData?.description || ''
   })
   
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [previewMode, setPreviewMode] = useState(false)
+  const [internalPreviewMode, setInternalPreviewMode] = useState(false)
+  const previewMode = externalPreviewMode !== undefined ? externalPreviewMode : internalPreviewMode
+  const [makeSecretFn, setMakeSecretFn] = useState<(() => void) | null>(null)
+  const [isPathManuallyEdited, setIsPathManuallyEdited] = useState(!!initialData?.fullPath)
+  
+  // Handle preview mode changes
+  const handlePreviewToggle = (newPreviewMode: boolean) => {
+    if (onPreviewToggle) {
+      onPreviewToggle(newPreviewMode)
+    } else {
+      setInternalPreviewMode(newPreviewMode)
+    }
+  }
+
+  // Handle status changes
+  const handleStatusChange = (newStatus: 'draft' | 'published') => {
+    if (onStatusChange) {
+      onStatusChange(newStatus)
+    } else {
+      updateArticleData('status', newStatus)
+    }
+  }
+  const [newTagName, setNewTagName] = useState('')
+  const [showTagInput, setShowTagInput] = useState(false)
+  
+  // Expose makeSecret function to parent
+  useEffect(() => {
+    if (onMakeSecret && makeSecretFn) {
+      onMakeSecret(makeSecretFn)
+    }
+  }, [onMakeSecret, makeSecretFn])
+
+  // Use external status if provided, otherwise use internal articleData.status
+  const currentStatus = externalStatus !== undefined ? externalStatus : articleData.status
+
+  // Process markdown content for preview, handling secrets
+  const processContentForPreview = (content: string): string => {
+    return content.replace(/\{\{SECRET:([^}]+)\}\}/g, (match, key) => {
+      const secret = articleData.secrets.find(s => s.key === key)
+      if (!secret) {
+        return `**[MISSING SECRET: ${key}]**`
+      }
+      if (secret.classificationLevel > classificationLevel) {
+        return `**[CLASSIFIED - Level ${secret.classificationLevel}]**`
+      }
+      return secret.content
+    })
+  }
 
   // Get available classification levels (user can create articles up to their level)
   const getAvailableClassificationLevels = () => {
@@ -69,14 +141,13 @@ export default function ArticleEditor({
   }
 
   // Generate full path automatically from title if not manually set
-  const generateFullPath = (title: string, sourceType: string): string => {
+  const generateFullPath = (title: string): string => {
     const slug = title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '')
     
-    const basePath = sourceType === 'doc' ? '/docs' : '/git'
-    return `${basePath}/${slug}`
+    return `/docs/${slug}`
   }
 
   // Update article data
@@ -85,8 +156,25 @@ export default function ArticleEditor({
       const updated = { ...prev, [field]: value }
       
       // Auto-generate full path when title changes (unless manually edited)
-      if (field === 'title' && !prev.fullPath) {
-        updated.fullPath = generateFullPath(value, updated.sourceType)
+      if (field === 'title' && !isPathManuallyEdited) {
+        updated.fullPath = generateFullPath(value as string)
+      }
+      
+      // Mark path as manually edited when user changes it
+      if (field === 'fullPath') {
+        setIsPathManuallyEdited(true)
+      }
+      
+      // Auto-generate parent path from full path
+      if (field === 'fullPath' || (field === 'title' && !isPathManuallyEdited)) {
+        const pathValue = field === 'fullPath' ? value as string : updated.fullPath
+        const pathParts = pathValue.split('/').filter(Boolean)
+        if (pathParts.length > 1) {
+          // Remove the last part to get parent path
+          updated.parentPath = '/' + pathParts.slice(0, -1).join('/')
+        } else {
+          updated.parentPath = undefined
+        }
       }
       
       return updated
@@ -170,18 +258,6 @@ export default function ArticleEditor({
 
   return (
     <div className={`${styles.articleEditor} ${getConditionalClass(styles, 'dark', isDark)} ${className}`}>
-      <div className={styles.header}>
-        <h2>{isEditing ? 'Edit Article' : 'Create New Article'}</h2>
-        <div className={styles.headerActions}>
-          <button
-            className={`${styles.toggleButton} ${previewMode ? styles.active : ''}`}
-            onClick={() => setPreviewMode(!previewMode)}
-            disabled={isLoading}
-          >
-            {previewMode ? '📝 Edit' : '👁️ Preview'}
-          </button>
-        </div>
-      </div>
 
       {errors.general && (
         <div className={styles.errorAlert}>
@@ -194,122 +270,177 @@ export default function ArticleEditor({
           <>
             {/* Article Metadata */}
             <div className={styles.metadata}>
-              <div className={styles.formRow}>
-                <div className={styles.formGroup}>
-                  <label htmlFor="title">Title *</label>
-                  <input
-                    id="title"
-                    type="text"
-                    value={articleData.title}
-                    onChange={(e) => updateArticleData('title', e.target.value)}
-                    placeholder="Enter article title"
-                    className={`${styles.input} ${errors.title ? styles.error : ''}`}
-                    disabled={isLoading}
-                  />
-                  {errors.title && <span className={styles.errorText}>{errors.title}</span>}
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="sourceType">Source Type</label>
-                  <select
-                    id="sourceType"
-                    value={articleData.sourceType}
-                    onChange={(e) => updateArticleData('sourceType', e.target.value as 'doc' | 'git')}
-                    className={styles.select}
-                    disabled={isLoading}
-                  >
-                    <option value="doc">Documentation</option>
-                    <option value="git">Git Repository</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className={styles.formRow}>
-                <div className={styles.formGroup}>
-                  <label htmlFor="fullPath">Full Path *</label>
+              {/* Row 1: URL, Classification, Status */}
+              <div className={styles.primaryRow}>
+                <div className={styles.urlField}>
+                  <label htmlFor="fullPath">URL *</label>
                   <input
                     id="fullPath"
                     type="text"
                     value={articleData.fullPath}
                     onChange={(e) => updateArticleData('fullPath', e.target.value)}
                     placeholder="/docs/getting-started"
-                    className={`${styles.input} ${errors.fullPath ? styles.error : ''}`}
+                    className={`${styles.pathInput} ${errors.fullPath ? styles.error : ''}`}
                     disabled={isLoading}
                   />
                   {errors.fullPath && <span className={styles.errorText}>{errors.fullPath}</span>}
                 </div>
 
-                <div className={styles.formGroup}>
-                  <label htmlFor="parentPath">Parent Path</label>
+                <div className={styles.fieldGroup}>
+                  <label>Classification</label>
+                  <div className={styles.classificationContainer}>
+                    {[1, 2, 3, 4, 5].map(level => (
+                      <button
+                        key={level}
+                        type="button"
+                        className={`${styles.classificationCircle} ${level <= articleData.classificationLevel ? styles.filled : ''} ${level <= classificationLevel ? styles.available : styles.disabled}`}
+                        data-level={level}
+                        onClick={() => level <= classificationLevel && updateArticleData('classificationLevel', level)}
+                        disabled={isLoading || level > classificationLevel}
+                      />
+                    ))}
+                    <div className={styles.levelIndicator} data-level={articleData.classificationLevel}>
+                      LEVEL {articleData.classificationLevel}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Row 2: Description and Tags */}
+              <div className={styles.secondaryRow}>
+                <div className={styles.descriptionField}>
+                  <label htmlFor="description">Description</label>
                   <input
-                    id="parentPath"
+                    id="description"
                     type="text"
-                    value={articleData.parentPath}
-                    onChange={(e) => updateArticleData('parentPath', e.target.value)}
-                    placeholder="/docs (optional)"
+                    value={articleData.description}
+                    onChange={(e) => updateArticleData('description', e.target.value)}
+                    placeholder="Brief description of the article"
                     className={styles.input}
                     disabled={isLoading}
                   />
                 </div>
-              </div>
-
-              <div className={styles.formRow}>
-                <div className={styles.formGroup}>
-                  <label htmlFor="classificationLevel">Classification Level</label>
-                  <select
-                    id="classificationLevel"
-                    value={articleData.classificationLevel}
-                    onChange={(e) => updateArticleData('classificationLevel', parseInt(e.target.value))}
-                    className={styles.select}
-                    disabled={isLoading}
-                  >
-                    {availableLevels.map(level => (
-                      <option key={level} value={level}>
-                        Level {level} {level === 1 ? '(Public)' : level === 2 ? '(Restricted)' : level === 3 ? '(Confidential)' : level === 4 ? '(Secret)' : level === 5 ? '(Top Secret)' : ''}
-                      </option>
-                    ))}
-                  </select>
+                
+                <div className={styles.tagsField}>
+                  <label>Tags</label>
+                  <div className={styles.tagsContainer}>
+                    <div className={styles.tagsList}>
+                      {articleData.tags.map((tag, index) => (
+                        <span
+                          key={tag.id || index}
+                          className={styles.tag}
+                          style={{ backgroundColor: isDark ? (tag.darkColor || tag.color) : tag.color }}
+                        >
+                          {tag.name}
+                          <button
+                            type="button"
+                            className={styles.removeTag}
+                            onClick={() => {
+                              const updatedTags = articleData.tags.filter((_, i) => i !== index)
+                              updateArticleData('tags', updatedTags)
+                            }}
+                            disabled={isLoading}
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                      
+                      {showTagInput ? (
+                        <div className={styles.tagInput}>
+                          <input
+                            type="text"
+                            value={newTagName}
+                            onChange={(e) => setNewTagName(e.target.value)}
+                            placeholder="Tag name"
+                            className={styles.newTagInput}
+                            disabled={isLoading}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault()
+                                if (newTagName.trim()) {
+                                  const hue = Math.random() * 360
+                                  const newTag = {
+                                    id: Date.now().toString(),
+                                    name: newTagName.trim(),
+                                    color: `hsl(${hue}, 50%, 60%)`,
+                                    darkColor: `hsl(${hue}, 50%, 40%)`
+                                  }
+                                  updateArticleData('tags', [...articleData.tags, newTag])
+                                  setNewTagName('')
+                                  setShowTagInput(false)
+                                }
+                              } else if (e.key === 'Escape') {
+                                setNewTagName('')
+                                setShowTagInput(false)
+                              }
+                            }}
+                            onBlur={() => {
+                              if (newTagName.trim()) {
+                                const hue = Math.random() * 360
+                                const newTag = {
+                                  id: Date.now().toString(),
+                                  name: newTagName.trim(),
+                                  color: `hsl(${hue}, 50%, 60%)`,
+                                  darkColor: `hsl(${hue}, 50%, 40%)`
+                                }
+                                updateArticleData('tags', [...articleData.tags, newTag])
+                              }
+                              setNewTagName('')
+                              setShowTagInput(false)
+                            }}
+                            autoFocus
+                          />
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className={styles.addTag}
+                          onClick={() => setShowTagInput(true)}
+                          disabled={isLoading}
+                        >
+                          + Add Tag
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="status">Status</label>
-                  <select
-                    id="status"
-                    value={articleData.status}
-                    onChange={(e) => updateArticleData('status', e.target.value as 'draft' | 'published')}
-                    className={styles.select}
-                    disabled={isLoading}
-                  >
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label htmlFor="description">Description</label>
-                <input
-                  id="description"
-                  type="text"
-                  value={articleData.description}
-                  onChange={(e) => updateArticleData('description', e.target.value)}
-                  placeholder="Brief description of the article (optional)"
-                  className={styles.input}
-                  disabled={isLoading}
-                />
               </div>
             </div>
 
-            {/* Content Editor */}
+            {/* Content Editor Window */}
             <div className={styles.editorSection}>
-              <label htmlFor="content">Content * ({articleData.secrets.length} secrets)</label>
-              <MarkdownEditor
-                value={articleData.content}
-                onChange={(content) => updateArticleData('content', content)}
-                secrets={articleData.secrets}
-                onSecretsChange={(secrets) => updateArticleData('secrets', secrets)}
-                className={errors.content || errors.secrets ? styles.error : ''}
-              />
+              <div className={styles.contentWindow}>
+                {/* Title Bar */}
+                <div className={styles.titleBar}>
+                  <input
+                    id="title"
+                    type="text"
+                    value={articleData.title}
+                    onChange={(e) => updateArticleData('title', e.target.value)}
+                    placeholder="Article title"
+                    className={`${styles.titleInput} ${errors.title ? styles.error : ''}`}
+                    disabled={isLoading}
+                  />
+                  <div className={styles.titleBarInfo}>
+                    {articleData.secrets.length} secrets
+                  </div>
+                </div>
+                
+                {/* Content Area */}
+                <MarkdownEditor
+                  value={articleData.content}
+                  onChange={(content) => updateArticleData('content', content)}
+                  secrets={articleData.secrets}
+                  onSecretsChange={(secrets) => updateArticleData('secrets', secrets)}
+                  className={errors.content || errors.secrets ? styles.error : ''}
+                  onMakeSecret={setMakeSecretFn}
+                />
+              </div>
+              
+              {/* Error Messages */}
+              {errors.title && <span className={styles.errorText}>{errors.title}</span>}
               {(errors.content || errors.secrets) && (
                 <span className={styles.errorText}>
                   {errors.content || errors.secrets}
@@ -325,7 +456,7 @@ export default function ArticleEditor({
               <div className={styles.previewMeta}>
                 <span>Path: {articleData.fullPath}</span>
                 <span>Level: {articleData.classificationLevel}</span>
-                <span>Status: {articleData.status}</span>
+                <span>Status: {currentStatus}</span>
                 {articleData.secrets.length > 0 && (
                   <span>Secrets: {articleData.secrets.length}</span>
                 )}
@@ -333,29 +464,30 @@ export default function ArticleEditor({
               {articleData.description && (
                 <p className={styles.previewDescription}>{articleData.description}</p>
               )}
+              {articleData.tags.length > 0 && (
+                <div className={styles.previewTags}>
+                  {articleData.tags.map((tag, index) => (
+                    <span
+                      key={tag.id || index}
+                      className={styles.previewTag}
+                      style={{ backgroundColor: isDark ? (tag.darkColor || tag.color) : tag.color }}
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             
             <div className={styles.previewContent}>
-              {articleData.content.split('\n').map((line, index) => (
-                <div key={index} className={styles.previewLine}>
-                  {line.split(/({{SECRET:[^}]+}})/).map((part, partIndex) => {
-                    if (part.match(/{{SECRET:[^}]+}}/)) {
-                      const secretKey = part.match(/{{SECRET:([^}]+)}}/)?.[1]
-                      const secret = articleData.secrets.find(s => s.key === secretKey)
-                      return (
-                        <span
-                          key={partIndex}
-                          className={`${styles.previewSecret} ${styles[`level${secret?.classificationLevel || 2}`]}`}
-                          title={secret ? `Level ${secret.classificationLevel}: ${secret.description || 'No description'}` : 'Unknown secret'}
-                        >
-                          [CLASSIFIED - Level {secret?.classificationLevel || '?'}]
-                        </span>
-                      )
-                    }
-                    return <span key={partIndex}>{part}</span>
-                  })}
-                </div>
-              ))}
+              <MarkdownHooks
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeStarryNight]}
+              >
+                {
+                  processContentForPreview(articleData.content)
+                }
+              </MarkdownHooks>
             </div>
           </div>
         )}
@@ -375,7 +507,7 @@ export default function ArticleEditor({
           onClick={handleSave}
           disabled={isLoading}
         >
-          {isLoading ? 'Saving...' : (isEditing ? 'Update Article' : 'Create Article')}
+{isLoading ? 'Saving...' : (currentStatus === 'draft' ? 'Save as Draft' : 'Publish')}
         </button>
       </div>
     </div>

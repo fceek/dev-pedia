@@ -18,6 +18,7 @@ interface LayoutProps {
   isExpanded?: boolean
   onExpandToggle?: (expanded: boolean) => void
   gridRatio?: string // e.g., "4fr 1fr", "2fr 1fr", "3fr 2fr"
+  onBreadcrumbClick?: (item: string) => void
 }
 
 export default function Layout({ 
@@ -29,7 +30,8 @@ export default function Layout({
   year,
   isExpanded: externalIsExpanded,
   onExpandToggle,
-  gridRatio = "4fr 1fr"
+  gridRatio = "4fr 1fr",
+  onBreadcrumbClick
 }: LayoutProps) {
   const { classificationLevel: authClassificationLevel } = useAuth()
   const { isDark, isFlashing, setIsDark, handleLightOn, isAdminTheme, getThemeClasses, getConditionalClass } = useTheme()
@@ -49,6 +51,7 @@ export default function Layout({
         breadcrumbs={breadcrumbs}
         classificationLevel={classificationLevel}
         isExpanded={isExpanded}
+        onBreadcrumbClick={onBreadcrumbClick}
       />
       
       <main className={styles.leftColumn}>

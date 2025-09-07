@@ -1,0 +1,517 @@
+.articleActions {
+    font-family: 'Google Sans Code', monospace;
+    min-width: 16rem;
+    max-width: 20rem;
+}
+
+.sectionTitle {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1rem;
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+.actionsList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-left: 1rem;
+}
+
+.actionButton {
+    padding: 0.5rem 0.75rem;
+    border: 0.0625rem solid var(--border-color);
+    background: var(--accent-color);
+    color: var(--text-color);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Google Sans Code', monospace;
+    text-align: left;
+}
+
+.actionButton:hover {
+    background: var(--bg-color);
+}
+
+.actionButton.active {
+    background: var(--classification-3-light);
+    color: black;
+    border-color: var(--classification-3-light);
+}
+
+.actionButton:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.toggleGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.toggleLabel {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--text-color);
+    opacity: 0.8;
+    letter-spacing: 0.05rem;
+}
+
+.toggleButtons {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.toggleButton {
+    flex: 1;
+    padding: 0.375rem 0.5rem;
+    border: 0.0625rem solid var(--border-color);
+    background: var(--accent-color);
+    color: var(--text-color);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Google Sans Code', monospace;
+}
+
+.toggleButton:hover {
+    background: var(--bg-color);
+}
+
+.toggleButton.active {
+    background: var(--classification-3-light);
+    color: black;
+    border-color: var(--classification-3-light);
+}
+
+/* Compact action button - single row toggle style */
+.compactActionButton {
+    display: flex;
+    border: 0.0625rem solid var(--border-color);
+    background: var(--accent-color);
+    font-family: 'Google Sans Code', monospace;
+    overflow: hidden;
+}
+
+.compactActionButton button {
+    flex: 1;
+    padding: 0.375rem 0.5rem;
+    border: none;
+    background: transparent;
+    color: var(--text-color);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.compactActionButton button:not(:last-child) {
+    border-right: 0.0625rem solid var(--border-color);
+}
+
+.compactActionButton button:hover {
+    background: var(--bg-color);
+}
+
+.compactActionButton button.active {
+    background: var(--classification-3-light);
+    color: black;
+}
+
+/* Dark theme active colors */
+.articleActions.dark .compactActionButton button.active {
+    background: var(--classification-3-dark);
+    color: black;
+}
+
+.articleActions.dark .toggleButton.active {
+    background: var(--classification-3-dark);
+    color: black;
+    border-color: var(--classification-3-dark);
+}
+
+.articleActions.dark .actionButton.active {
+    background: var(--classification-3-dark);
+    color: black;
+    border-color: var(--classification-3-dark);
+}
+
+/* Toggle row - puts two compact toggles side by side */
+.toggleRow {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.toggleRow .compactActionButton {
+    flex: 1;
+}
+
+/* Single-row labeled action */
+.labeledAction {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.inlineLabel {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--text-color);
+    opacity: 0.8;
+    letter-spacing: 0.05rem;
+    white-space: nowrap;
+}
+
+/* Section divider */
+.divider {
+    height: 0.0625rem;
+    background: var(--border-color);
+    opacity: 0.3;
+    margin: 0.5rem 0;
+}
+
+/* Formatting controls section */
+.formattingSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+/* Header controls styling - manual color matching */
+.compactActionButton button.headerLabel {
+    flex: 2;
+    background: rgba(0, 0, 0, 0.15);
+    color: var(--text-color);
+    cursor: default;
+    pointer-events: none;
+    border-right: 0.0625rem solid var(--border-color);
+}
+
+.compactActionButton button.headerLabel:hover {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.articleActions.dark .compactActionButton button.headerLabel {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.articleActions.dark .compactActionButton button.headerLabel:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.compactActionButton button.headerNumber {
+    flex: 0.8;
+    font-size: 0.6875rem;
+    font-weight: 700;
+}
+
+.compactActionButton button.tableShadowButton {
+    flex: none;
+    width: 1rem;
+    background: rgba(0, 0, 0, 0.15);
+    cursor: default;
+    pointer-events: none;
+}
+
+.compactActionButton button.tableShadowButton:hover {
+    background: rgba(0, 0, 0, 0.15);
+    transform: none;
+}
+
+.articleActions.dark .compactActionButton button.tableShadowButton {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.articleActions.dark .compactActionButton button.tableShadowButton:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Callout buttons with color tints */
+.compactActionButton button.calloutButton[data-callout="info"] {
+    background: rgba(59, 130, 246, 0.25);
+    color: rgb(30, 64, 175);
+}
+
+.compactActionButton button.calloutButton[data-callout="success"] {
+    background: rgba(34, 197, 94, 0.25);
+    color: rgb(21, 128, 61);
+}
+
+.compactActionButton button.calloutButton[data-callout="warning"] {
+    background: rgba(251, 191, 36, 0.3);
+    color: rgb(146, 64, 14);
+}
+
+.compactActionButton button.calloutButton[data-callout="error"] {
+    background: rgba(239, 68, 68, 0.25);
+    color: rgb(153, 27, 27);
+}
+
+.compactActionButton button.calloutButton[data-callout="custom"] {
+    background: linear-gradient(90deg, 
+        rgba(255, 0, 0, 0.15) 0%, 
+        rgba(255, 154, 0, 0.15) 16.67%, 
+        rgba(255, 206, 84, 0.15) 33.33%, 
+        rgba(0, 255, 0, 0.15) 50%, 
+        rgba(0, 150, 255, 0.15) 66.67%, 
+        rgba(119, 0, 255, 0.15) 83.33%, 
+        rgba(255, 0, 150, 0.15) 100%);
+    background-size: 200% 100%;
+    animation: rainbow 3s linear infinite;
+}
+
+@keyframes rainbow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
+/* Dark theme callout buttons */
+.articleActions.dark .compactActionButton button.calloutButton[data-callout="info"] {
+    background: rgba(59, 130, 246, 0.2);
+    color: rgb(147, 197, 253);
+}
+
+.articleActions.dark .compactActionButton button.calloutButton[data-callout="success"] {
+    background: rgba(34, 197, 94, 0.2);
+    color: rgb(134, 239, 172);
+}
+
+.articleActions.dark .compactActionButton button.calloutButton[data-callout="warning"] {
+    background: rgba(251, 191, 36, 0.2);
+    color: rgb(254, 240, 138);
+}
+
+.articleActions.dark .compactActionButton button.calloutButton[data-callout="error"] {
+    background: rgba(239, 68, 68, 0.2);
+    color: rgb(252, 165, 165);
+}
+
+/* Hover effects */
+.compactActionButton button.calloutButton:hover {
+    opacity: 0.8;
+}
+
+
+/* Classification Stamp System - Modern document stamping */
+.classificationSystem {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+}
+
+/* Document area - like a real document being stamped */
+.documentArea {
+    position: relative;
+    padding: 0.5rem;
+    background: var(--bg-color);
+    border: 0.0625rem solid var(--border-color);
+    overflow: hidden;
+    width: 100%;
+}
+
+.documentText {
+    font-size: 1.5rem;
+    color: var(--classification-1-light);
+    font-weight: 700;
+    font-family: 'Google Sans Code', monospace;
+    letter-spacing: 0.25rem;
+    text-transform: uppercase;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+.articleActions.dark .documentText {
+    color: var(--classification-1-dark);
+    text-shadow: 0.0625rem 0.0625rem 0.125rem rgba(255, 255, 255, 0.1);
+}
+
+.levelText {
+    font-weight: 600;
+    font-size: 0.8125rem;
+}
+
+
+@keyframes stampIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Stamp tray - sticky notes extending from document */
+.stampTray {
+    position: absolute;
+    bottom: -2.25rem;
+    left: 1rem;
+    display: flex;
+    gap: 0.125rem;
+    z-index: -1;
+}
+
+/* Stamp circles - sticky note style extending from document */
+.stampCircle {
+    width: 1.75rem;
+    height: 2.5rem;
+    border: 0.0625rem solid;
+    border-top: none;
+    border-radius: 0 0 0.375rem 0.375rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Google Sans Code', monospace;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: white;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
+}
+
+.stampCircle:hover {
+    box-shadow: 0 0.375rem 0.5rem rgba(0, 0, 0, 0.3);
+    z-index: 2;
+}
+
+.stampCircle[data-level="1"]:hover {
+    transform: rotate(-2deg) translateY(-0.25rem);
+}
+
+.stampCircle[data-level="2"]:hover {
+    transform: rotate(1deg) translateY(-0.25rem);
+}
+
+.stampCircle[data-level="3"]:hover {
+    transform: rotate(-1deg) translateY(-0.25rem);
+}
+
+.stampCircle[data-level="4"]:hover {
+    transform: rotate(2deg) translateY(-0.25rem);
+}
+
+.stampCircle[data-level="5"]:hover {
+    transform: rotate(-1.5deg) translateY(-0.25rem);
+}
+
+.stampCircle:active {
+    transform: translateY(0.125rem);
+    transition: all 0.1s ease;
+}
+
+/* Used stamp - grey silhouette effect */
+.stampCircle.used {
+    opacity: 0.25;
+    background: transparent !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-color) !important;
+    transform: none !important;
+    cursor: default;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 0.0625rem var(--border-color);
+}
+
+/* Stamp overlay - appears over document like real stamping */
+.stampOverlay.stampCircle[data-level] {
+    position: absolute;
+    top: -0.75rem;
+    right: -0.5rem;
+    transform: rotate(-16deg);
+    animation: stampIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    width: 4.25rem;
+    height: 4.5rem;
+    font-size: 1.25rem;
+    opacity: 1;
+    border-width: 0.25rem;
+}
+
+.levelNumber {
+    font-weight: 700;
+    letter-spacing: 0.025rem;
+    color: white;
+}
+
+/* Ensure overlay stamp numbers are pure white with highest specificity */
+.documentArea .stampOverlay.stampCircle[data-level] .levelNumber {
+    color: white;
+}
+
+/* Level-specific circle styling with slight tilts */
+.stampCircle[data-level="1"] {
+    background: var(--classification-1-light);
+    border-color: var(--classification-1-light);
+    color: white;
+    transform: rotate(-2deg);
+}
+
+.stampCircle[data-level="2"] {
+    background: var(--classification-2-light);
+    border-color: var(--classification-2-light);
+    color: white;
+    transform: rotate(1deg);
+}
+
+.stampCircle[data-level="3"] {
+    background: var(--classification-3-light);
+    border-color: var(--classification-3-light);
+    color: white;
+    transform: rotate(-1deg);
+}
+
+.stampCircle[data-level="4"] {
+    background: var(--classification-4-light);
+    border-color: var(--classification-4-light);
+    color: white;
+    transform: rotate(2deg);
+}
+
+.stampCircle[data-level="5"] {
+    background: var(--classification-5-light);
+    border-color: var(--classification-5-light);
+    color: white;
+    transform: rotate(-1.5deg);
+}
+
+/* Dark theme variations */
+.articleActions.dark .stampCircle[data-level="1"] {
+    background: var(--classification-1-dark);
+    border-color: var(--classification-1-dark);
+    color: white;
+}
+
+.articleActions.dark .stampCircle[data-level="2"] {
+    background: var(--classification-2-dark);
+    border-color: var(--classification-2-dark);
+    color: white;
+}
+
+.articleActions.dark .stampCircle[data-level="3"] {
+    background: var(--classification-3-dark);
+    border-color: var(--classification-3-dark);
+    color: white;
+}
+
+.articleActions.dark .stampCircle[data-level="4"] {
+    background: var(--classification-4-dark);
+    border-color: var(--classification-4-dark);
+    color: white;
+}
+
+.articleActions.dark .stampCircle[data-level="5"] {
+    background: var(--classification-5-dark);
+    border-color: var(--classification-5-dark);
+    color: white;
+}

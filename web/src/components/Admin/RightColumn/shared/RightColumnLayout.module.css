@@ -1,0 +1,107 @@
+.rightColumnLayout {
+    height: 100%;
+    padding: 4rem 2rem;
+    font-family: 'Google Sans Code', monospace;
+    position: relative;
+    overflow: hidden; /* Clip animated content that moves above the area */
+}
+
+/* Tree structure styling */
+.treeContainer {
+    position: relative;
+    opacity: 0; /* Always start invisible */
+    transform: translateY(-20px); /* Always start in fade-in position */
+}
+
+.mainVerticalLine {
+    position: absolute;
+    left: 1rem;
+    top: -4rem; /* Connect back to header border */
+    bottom: 4rem;
+    width: 2px;
+    background: var(--border-color);
+    z-index: 1;
+}
+
+.separateContent {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+    opacity: 0; /* Start invisible for new content */
+    transform: translateX(20px); /* Start from right for fade in */
+}
+
+/* Tree animations - fade up/down from header */
+.treeContainer.fadeOut {
+    opacity: 0;
+    transform: translateY(-20px); /* Fade out towards header */
+    animation: fadeOutUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+.treeContainer.fadeIn {
+    opacity: 1;
+    transform: translateY(0);
+    animation: fadeInDown 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeOutUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes fadeInDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    1% {
+        opacity: 0; /* Stay invisible for first 1% to override any base visibility */
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Quick actions animations - fade left/right from edge */
+.separateContent.fadeOutRight {
+    opacity: 0;
+    transform: translateX(20px); /* Fade out towards right edge */
+    animation: fadeOutRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.separateContent.fadeInRight {
+    opacity: 1;
+    transform: translateX(0);
+    animation: fadeInLeft 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 0.7; /* Match the original separateContent opacity */
+        transform: translateX(0);
+    }
+}

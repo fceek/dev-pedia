@@ -5,7 +5,12 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import styles from './IntegrationCard.module.css'
 
-export default function IntegrationCard() {
+interface CardProps {
+  isExpanded?: boolean
+  isPushedAway?: boolean
+}
+
+export default function IntegrationCard({ isExpanded = false, isPushedAway = false }: CardProps) {
   const { user } = useAuth()
   const { isDark, getConditionalClass } = useTheme()
   const [syncStatus, setSyncStatus] = useState<'sync' | 'syncing' | 'synced' | 'error'>('sync')
@@ -66,7 +71,7 @@ export default function IntegrationCard() {
   }
 
   return (
-    <div className={`${styles.integrationCard} ${getConditionalClass(styles, 'dark', isDark)}`}>
+    <div className={`${styles.integrationCard} ${getConditionalClass(styles, 'dark', isDark)} ${getConditionalClass(styles, 'pushedAway', isPushedAway)}`}>
       <div className={styles.cardHeader}>
         <div className={styles.typeLabel}>GITHUB</div>
         <div className={styles.actionButtons}>
@@ -164,6 +169,13 @@ export default function IntegrationCard() {
             </text>
           </svg>
           <div className={styles.pieCaption}>Coverage</div>
+        </div>
+      )}
+
+      {/* File folder tab hint */}
+      {isPushedAway && (
+        <div className={styles.pushedHint}>
+          <div className={styles.hintLabel}>INTEGRATIONS</div>
         </div>
       )}
     </div>

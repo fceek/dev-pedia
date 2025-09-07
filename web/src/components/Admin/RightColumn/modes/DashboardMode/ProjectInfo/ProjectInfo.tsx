@@ -7,7 +7,7 @@ export default function ProjectInfo() {
   const { isDark, getConditionalClass } = useTheme()
 
   const handleGithubClick = () => {
-    window.open('', '_blank')
+    window.open('https://github.com/fceek/dev-pedia', '_blank')
   }
 
   return (

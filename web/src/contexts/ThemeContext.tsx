@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { usePathname } from 'next/navigation'
 
-type ThemeMode = 'light' | 'dark' | 'admin-light' | 'admin-dark'
+type ThemeMode = 'light' | 'dark' | 'admin-light' | 'admin-dark' | 'auto'
 
 interface ThemeContextType {
   isDark: boolean
@@ -26,15 +26,23 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [baseThemeMode, setBaseThemeModeState] = useState<'light' | 'dark'>('light')
+  const [baseThemeMode, setBaseThemeModeState] = useState<'light' | 'dark' | 'auto'>('auto')
   const [isFlashing, setIsFlashing] = useState(false)
   const pathname = usePathname()
   
   // Auto-detect admin theme based on current route
   const isOnAdminRoute = pathname?.startsWith('/admin') || false
-  const themeMode: ThemeMode = isOnAdminRoute 
-    ? (baseThemeMode === 'dark' ? 'admin-dark' : 'admin-light')
-    : baseThemeMode
+  
+  // Determine final theme mode
+  let themeMode: ThemeMode
+  if (baseThemeMode === 'auto') {
+    // Use system preference, but apply admin variant if on admin route
+    themeMode = isOnAdminRoute ? 'admin-light' : 'light' // Default to light, CSS handles system dark
+  } else if (isOnAdminRoute) {
+    themeMode = baseThemeMode === 'dark' ? 'admin-dark' : 'admin-light'
+  } else {
+    themeMode = baseThemeMode
+  }
 
   const isDark = themeMode === 'dark' || themeMode === 'admin-dark'
   const isAdminTheme = themeMode === 'admin-light' || themeMode === 'admin-dark'
@@ -42,8 +50,8 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   // Load base theme from localStorage on mount
   useEffect(() => {
     try {
-      const savedTheme = localStorage.getItem('baseTheme') as 'light' | 'dark'
-      if (savedTheme && ['light', 'dark'].includes(savedTheme)) {
+      const savedTheme = localStorage.getItem('baseTheme') as 'light' | 'dark' | 'auto'
+      if (savedTheme && ['light', 'dark', 'auto'].includes(savedTheme)) {
         setBaseThemeModeState(savedTheme)
       }
     } catch (error) {
@@ -51,9 +59,30 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     }
   }, [])
 
+  // Apply theme class to body
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    
+    // Remove all theme classes
+    document.body.classList.remove('theme-light', 'theme-dark', 'theme-admin-light', 'theme-admin-dark')
+    
+    // Add current theme class (unless auto mode)
+    if (baseThemeMode !== 'auto') {
+      const themeClass = `theme-${themeMode}`
+      document.body.classList.add(themeClass)
+    }
+  }, [baseThemeMode, themeMode])
+
   // Save base theme to localStorage when it changes
   const setThemeMode = (mode: ThemeMode) => {
-    const baseMode = mode === 'dark' || mode === 'admin-dark' ? 'dark' : 'light'
+    let baseMode: 'light' | 'dark' | 'auto'
+    if (mode === 'dark' || mode === 'admin-dark') {
+      baseMode = 'dark'
+    } else if (mode === 'light' || mode === 'admin-light') {
+      baseMode = 'light'
+    } else {
+      baseMode = 'auto'
+    }
     setBaseThemeModeState(baseMode)
     try {
       localStorage.setItem('baseTheme', baseMode)
@@ -63,9 +92,10 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }
 
   const setIsDark = (dark: boolean) => {
-    setBaseThemeModeState(dark ? 'dark' : 'light')
+    const newMode = dark ? 'dark' : 'light'
+    setBaseThemeModeState(newMode)
     try {
-      localStorage.setItem('baseTheme', dark ? 'dark' : 'light')
+      localStorage.setItem('baseTheme', newMode)
     } catch (error) {
       console.warn('Failed to save theme to localStorage:', error)
     }

@@ -3,7 +3,20 @@
     height: 100%;
     padding: 4rem 2rem;
     overflow-y: auto;
+    position: relative;
+    perspective: 1000px;
     /*border-right: 2px solid var(--border-color);*/
+}
+
+/* In expanded mode, remove top/bottom padding for full-height tabs */
+.dashboard.expandedLayout {
+    padding: 0;
+}
+
+
+.dashboard.expanded {
+    padding: 2rem;
+    overflow: hidden;
 }
 
 .cardsGrid {
@@ -11,7 +24,261 @@
     grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
     gap: 5rem 2rem;
     align-items: start;
+    position: relative;
 }
+
+/* Cards flying out to make room for editor */
+.cardsGrid.fading {
+    opacity: 0;
+    animation: fadeOutCards 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeOutCards {
+    from {
+        opacity: 1;
+        transform: translateZ(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateZ(-50px);
+    }
+}
+
+/* Cards flying back in when returning from expanded mode */
+.cardsGrid.fadingIn {
+    opacity: 0;
+    animation: fadeInCards 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeInCards {
+    from {
+        opacity: 0;
+        transform: translateZ(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateZ(0);
+    }
+}
+
+/* Expanded Mode Layout - full height with proper margins */
+.expandedMode {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    gap: 0;
+    opacity: 0;
+    animation: fadeInExpandedMode 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeInExpandedMode {
+    from {
+        opacity: 0;
+        transform: translateZ(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateZ(0);
+    }
+}
+
+@keyframes fadeOutExpandedMode {
+    from {
+        opacity: 1;
+        transform: translateZ(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateZ(50px);
+    }
+}
+
+.expandedMode.fadingOut {
+    animation: fadeOutExpandedMode 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Left margin tabs container - full height */
+.tabsContainer {
+    width: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 2rem 0;
+    background: transparent;
+    opacity: 0;
+    animation: fadeInFromScreen 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    box-sizing: border-box;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 10;
+}
+
+@keyframes fadeInFromScreen {
+    from {
+        opacity: 0;
+        transform: translateZ(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateZ(0) scale(1);
+    }
+}
+
+/* Close tab - matches card design language */
+.closeTab {
+    width: 1.75rem;
+    height: 1.75rem;
+    background: #f8f8f6;
+    border: 0.125rem solid var(--border-color);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text-color);
+    font-family: 'Google Sans Code', monospace;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 
+        0.125rem 0.125rem 0 rgba(0, 0, 0, 0.1),
+        0.25rem 0.25rem 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.closeTab:hover {
+    box-shadow: 
+        0.1875rem 0.1875rem 0 rgba(0, 0, 0, 0.15),
+        0.3125rem 0.3125rem 0 rgba(0, 0, 0, 0.08);
+    background: #ff6b6b;
+    color: white;
+    border-color: #ff6b6b;
+}
+
+.dashboard.dark .closeTab {
+    background: #1a1a18;
+    box-shadow: 
+        0.125rem 0.125rem 0 rgba(255, 255, 255, 0.08),
+        0.25rem 0.25rem 0 rgba(255, 255, 255, 0.04);
+}
+
+.dashboard.dark .closeTab:hover {
+    box-shadow: 
+        0.1875rem 0.1875rem 0 rgba(255, 255, 255, 0.12),
+        0.3125rem 0.3125rem 0 rgba(255, 255, 255, 0.06);
+}
+
+.closeTab:hover {
+    background: #ff6b6b;
+    color: white;
+    border-color: #ff6b6b;
+}
+
+/* Tab buttons */
+.tab {
+    width: 1.75rem;
+    min-height: 4rem;
+    background: #f8f8f6;
+    border: 0.125rem solid var(--border-color);
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05rem;
+    color: var(--text-color);
+    transition: all 0.2s ease;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Google Sans Code', monospace;
+    padding: 0.5rem 0;
+    box-shadow: 
+        0.125rem 0.125rem 0 rgba(0, 0, 0, 0.1),
+        0.25rem 0.25rem 0 rgba(0, 0, 0, 0.05);
+}
+
+.tab:hover {
+    box-shadow: 
+        0.1875rem 0.1875rem 0 rgba(0, 0, 0, 0.15),
+        0.3125rem 0.3125rem 0 rgba(0, 0, 0, 0.08);
+    background: #f0f0ee;
+}
+
+.tab.active {
+    background: var(--classification-1-light);
+    color: white;
+    border-color: var(--classification-1-light);
+    box-shadow: 
+        0.125rem 0.125rem 0 rgba(0, 0, 0, 0.15),
+        0.25rem 0.25rem 0 rgba(0, 0, 0, 0.08);
+}
+
+.dashboard.dark .tab {
+    background: #1a1a18;
+    box-shadow: 
+        0.125rem 0.125rem 0 rgba(255, 255, 255, 0.08),
+        0.25rem 0.25rem 0 rgba(255, 255, 255, 0.04);
+}
+
+.dashboard.dark .tab:hover {
+    box-shadow: 
+        0.1875rem 0.1875rem 0 rgba(255, 255, 255, 0.12),
+        0.3125rem 0.3125rem 0 rgba(255, 255, 255, 0.06);
+    background: #2a2a28;
+}
+
+.dashboard.dark .tab.active {
+    background: var(--classification-1-dark);
+    border-color: var(--classification-1-dark);
+    box-shadow: 
+        0.125rem 0.125rem 0 rgba(255, 255, 255, 0.12),
+        0.25rem 0.25rem 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Expanded content area - with proper margins */
+.expandedContent {
+    flex: 1;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    animation: fadeInFromOutside 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0.1s forwards;
+    box-sizing: border-box;
+    margin-left: 2rem;
+}
+
+/* Center cards when showing individual cards (not editors) */
+.expandedContent.cardMode {
+    justify-content: center;
+    align-items: center;
+}
+
+/* Ensure editor mode uses full space */
+.expandedContent.editorMode {
+    justify-content: stretch;
+    align-items: stretch;
+}
+
+@keyframes fadeInFromOutside {
+    from {
+        opacity: 0;
+        transform: translateZ(50px) scale(1.05);
+    }
+    to {
+        opacity: 1;
+        transform: translateZ(0) scale(1);
+    }
+}
+
+.editorInExpanded {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+}
+
 
 /* Custom scrollbar styling */
 .dashboard::-webkit-scrollbar {

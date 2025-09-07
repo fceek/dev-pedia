@@ -36,6 +36,15 @@
     transition: text-shadow 0.2s ease;
 }
 
+.clickable {
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.clickable:hover {
+    opacity: 0.7;
+}
+
 /* Admin theme directional glow */
 .breadcrumb.admin .logoText span {
     text-shadow: 

@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
+import { useRouter } from 'next/navigation'
 import styles from './Breadcrumb.module.css'
 
 interface BreadcrumbProps {
   items: string[]
   showLogo?: boolean
+  onItemClick?: (item: string) => void
 }
 
 interface AnimatedItem {
@@ -16,11 +18,22 @@ interface AnimatedItem {
   isDivider: boolean
 }
 
-export default function Breadcrumb({ items, showLogo = true }: BreadcrumbProps) {
+export default function Breadcrumb({ items, showLogo = true, onItemClick }: BreadcrumbProps) {
   const { getThemeClasses } = useTheme()
+  const router = useRouter()
   const [animatedItems, setAnimatedItems] = useState<AnimatedItem[]>([])
   const [prevItems, setPrevItems] = useState<string[]>(items)
   const [removingItems, setRemovingItems] = useState<AnimatedItem[]>([])
+
+  const handleItemClick = (item: string) => {
+    if (onItemClick) {
+      onItemClick(item)
+    }
+  }
+
+  const handleLogoClick = () => {
+    router.push('/')
+  }
 
   // Helper function to convert breadcrumb items to animated items with dividers
   const createAnimatedItems = (breadcrumbItems: string[], isAnimating: boolean = false): AnimatedItem[] => {
@@ -89,6 +102,8 @@ export default function Breadcrumb({ items, showLogo = true }: BreadcrumbProps) 
 
       // Determine which current items are new
       const newAnimatedItems = createAnimatedItems(items)
+      const removedItemsSet = new Set(removedItems)
+      
       newAnimatedItems.forEach(animatedItem => {
         if (!animatedItem.isDivider) {
           // Only breadcrumb items can be "new", dividers follow their items
@@ -103,12 +118,34 @@ export default function Breadcrumb({ items, showLogo = true }: BreadcrumbProps) 
         }
       })
       
-      setAnimatedItems(newAnimatedItems)
-
-      // Clear animations after they complete
-      setTimeout(() => {
-        setAnimatedItems(createAnimatedItems(items))
-      }, 300)
+      // For mode switching (replacing items), delay showing new items until removal completes
+      const isModeSwitching = removedItems.length > 0 && 
+                              items.some(item => !prevItems.includes(item)) &&
+                              items.length === prevItems.length
+      
+      if (isModeSwitching) {
+        // Update animatedItems to exclude the items being removed (to avoid duplication)
+        const currentItemsWithoutRemoved = prevItems.filter(item => !removedItems.includes(item))
+        setAnimatedItems(createAnimatedItems(currentItemsWithoutRemoved))
+        
+        // Don't show new items immediately - wait for removal to complete
+        setTimeout(() => {
+          setAnimatedItems(newAnimatedItems)
+          
+          // Clear animations after they complete
+          setTimeout(() => {
+            setAnimatedItems(createAnimatedItems(items))
+          }, 300)
+        }, 300)
+      } else {
+        // Normal case - show new items immediately
+        setAnimatedItems(newAnimatedItems)
+        
+        // Clear animations after they complete  
+        setTimeout(() => {
+          setAnimatedItems(createAnimatedItems(items))
+        }, 300)
+      }
 
       setPrevItems(items)
     }
@@ -132,7 +169,8 @@ export default function Breadcrumb({ items, showLogo = true }: BreadcrumbProps) 
           key={animatedItem.key}
           className={`${animatedItem.isDivider ? styles.divider : styles.breadcrumbItem} ${
             animatedItem.isAnimating ? styles.fadeInFromRight : ''
-          }`}
+          } ${!animatedItem.isDivider && onItemClick ? styles.clickable : ''}`}
+          onClick={!animatedItem.isDivider ? () => handleItemClick(animatedItem.text) : undefined}
         >
           {animatedItem.text}
         </span>
@@ -141,7 +179,7 @@ export default function Breadcrumb({ items, showLogo = true }: BreadcrumbProps) 
       {showLogo && (
         <>
           <span className={styles.divider}>&lt;</span>
-          <div className={styles.logoText}>
+          <div className={`${styles.logoText} ${styles.clickable}`} onClick={handleLogoClick}>
             <div className={styles.logo}>
               <svg viewBox="0 0 72 34" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <text x="5" y="20" fontSize="20" fontWeight="bold" fill="currentColor">&#123;DEV&#125;</text>

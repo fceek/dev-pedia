@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import styles from './MarkdownEditor.module.css'
@@ -20,6 +20,7 @@ interface MarkdownEditorProps {
   placeholder?: string
   rows?: number
   className?: string
+  onMakeSecret?: (makeSecretFn: () => void) => void
 }
 
 export default function MarkdownEditor({
@@ -29,17 +30,42 @@ export default function MarkdownEditor({
   onSecretsChange,
   placeholder = "Write your article content here...\n\nYou can select text and convert it to classified content using the toolbar above.",
   rows = 15,
-  className = ""
+  className = "",
+  onMakeSecret
 }: MarkdownEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const overlayRef = useRef<HTMLDivElement>(null)
   const { classificationLevel } = useAuth()
   const { isDark, getConditionalClass } = useTheme()
   
   const [selectedText, setSelectedText] = useState('')
   const [selectionStart, setSelectionStart] = useState(0)
   const [selectionEnd, setSelectionEnd] = useState(0)
-  const [showSecretModal, setShowSecretModal] = useState(false)
-  const [editingSecret, setEditingSecret] = useState<Secret | null>(null)
+
+  // Auto-resize textarea to fit content
+  const autoResizeTextarea = useCallback(() => {
+    if (!textareaRef.current || !overlayRef.current) return
+    
+    const textarea = textareaRef.current
+    const overlay = overlayRef.current
+    
+    // Reset height to measure scroll height accurately
+    textarea.style.height = 'auto'
+    
+    // Calculate new height (content + padding)
+    const contentHeight = textarea.scrollHeight
+    const minHeight = 400 // Match CSS min-height
+    const newHeight = Math.max(contentHeight, minHeight)
+    
+    // Apply height to both textarea and overlay
+    textarea.style.height = `${newHeight}px`
+    overlay.style.height = `${newHeight}px`
+  }, [])
+
+  // Auto-resize when value changes
+  useEffect(() => {
+    autoResizeTextarea()
+  }, [value, autoResizeTextarea])
 
   // Handle text selection
   const handleSelectionChange = useCallback(() => {
@@ -57,42 +83,15 @@ export default function MarkdownEditor({
   // Convert selected text to secret
   const handleCreateSecret = () => {
     if (!selectedText) return
-    setEditingSecret({
-      key: '',
-      classificationLevel: 2,
-      content: selectedText,
-      description: ''
-    })
-    setShowSecretModal(true)
+    // This function is exposed to parent for external handling
   }
 
-  // Save secret and replace text with placeholder
-  const handleSaveSecret = (secret: Secret) => {
-    if (!secret.key.trim()) return
-
-    // Add or update secret in list
-    const updatedSecrets = editingSecret 
-      ? secrets.map(s => s.key === editingSecret.key ? secret : s)
-      : [...secrets, secret]
-    
-    onSecretsChange(updatedSecrets)
-
-    // Replace selected text with placeholder
-    const placeholder = `{{SECRET:${secret.key}}}`
-    const newValue = value.substring(0, selectionStart) + placeholder + value.substring(selectionEnd)
-    onChange(newValue)
-
-    setShowSecretModal(false)
-    setEditingSecret(null)
-    setSelectedText('')
-  }
 
   // Edit existing secret
   const handleEditSecret = (secretKey: string) => {
     const secret = secrets.find(s => s.key === secretKey)
     if (secret) {
-      setEditingSecret(secret)
-      setShowSecretModal(true)
+      // This function is exposed to parent for external handling
     }
   }
 
@@ -110,49 +109,17 @@ export default function MarkdownEditor({
     onSecretsChange(secrets.filter(s => s.key !== secretKey))
   }
 
-  // Get available classification levels (user can create secrets up to their level)
-  const getAvailableLevels = () => {
-    const levels = []
-    for (let i = 2; i <= classificationLevel; i++) {
-      levels.push(i)
+
+
+  // Expose handleCreateSecret to parent component
+  useEffect(() => {
+    if (onMakeSecret) {
+      onMakeSecret(handleCreateSecret)
     }
-    return levels
-  }
-
-  // Count secrets by level for display
-  const getSecretCounts = () => {
-    const counts: Record<number, number> = {}
-    secrets.forEach(secret => {
-      counts[secret.classificationLevel] = (counts[secret.classificationLevel] || 0) + 1
-    })
-    return counts
-  }
-
-  const secretCounts = getSecretCounts()
+  }, [onMakeSecret, handleCreateSecret])
 
   return (
     <div className={`${styles.editorContainer} ${getConditionalClass(styles, 'dark', isDark)} ${className}`}>
-      {/* Toolbar */}
-      <div className={styles.toolbar}>
-        <div className={styles.toolbarLeft}>
-          <button
-            className={`${styles.toolButton} ${selectedText ? styles.active : styles.disabled}`}
-            onClick={handleCreateSecret}
-            disabled={!selectedText}
-            title="Convert selected text to classified content"
-          >
-            🔐 Make Secret ({selectedText.length} chars)
-          </button>
-        </div>
-        
-        <div className={styles.toolbarRight}>
-          {Object.entries(secretCounts).map(([level, count]) => (
-            <span key={level} className={styles.secretCount}>
-              Level {level}: {count}
-            </span>
-          ))}
-        </div>
-      </div>
 
       {/* Editor */}
       <div className={styles.editorWrapper}>
@@ -160,7 +127,11 @@ export default function MarkdownEditor({
           ref={textareaRef}
           className={styles.editor}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => {
+            onChange(e.target.value)
+            // Trigger auto-resize on next frame to ensure DOM is updated
+            setTimeout(autoResizeTextarea, 0)
+          }}
           onSelect={handleSelectionChange}
           onMouseUp={handleSelectionChange}
           onKeyUp={handleSelectionChange}
@@ -170,7 +141,7 @@ export default function MarkdownEditor({
         />
         
         {/* Secret placeholders overlay for visual highlighting */}
-        <div className={styles.highlightOverlay}>
+        <div ref={overlayRef} className={styles.highlightOverlay}>
           {value.split('\n').map((line, lineIndex) => (
             <div key={lineIndex} className={styles.line}>
               {line.split(/({{SECRET:[^}]+}})/).map((part, partIndex) => {
@@ -232,106 +203,7 @@ export default function MarkdownEditor({
         </div>
       )}
 
-      {/* Secret Modal */}
-      {showSecretModal && editingSecret && (
-        <SecretModal
-          secret={editingSecret}
-          availableLevels={getAvailableLevels()}
-          onSave={handleSaveSecret}
-          onCancel={() => {
-            setShowSecretModal(false)
-            setEditingSecret(null)
-          }}
-          isDark={isDark}
-        />
-      )}
     </div>
   )
 }
 
-// Secret editing modal component
-interface SecretModalProps {
-  secret: Secret
-  availableLevels: number[]
-  onSave: (secret: Secret) => void
-  onCancel: () => void
-  isDark: boolean
-}
-
-function SecretModal({ secret, availableLevels, onSave, onCancel, isDark }: SecretModalProps) {
-  const [formData, setFormData] = useState(secret)
-
-  const handleSave = () => {
-    if (formData.key.trim()) {
-      onSave(formData)
-    }
-  }
-
-  return (
-    <div className={styles.modalOverlay}>
-      <div className={`${styles.modal} ${isDark ? styles.dark : ''}`}>
-        <h3>Configure Classified Content</h3>
-        
-        <div className={styles.formGroup}>
-          <label>Secret Key (unique identifier)</label>
-          <input
-            type="text"
-            value={formData.key}
-            onChange={(e) => setFormData(prev => ({ ...prev, key: e.target.value }))}
-            placeholder="e.g., database-credentials, api-keys"
-            className={styles.input}
-          />
-        </div>
-
-        <div className={styles.formGroup}>
-          <label>Classification Level</label>
-          <select
-            value={formData.classificationLevel}
-            onChange={(e) => setFormData(prev => ({ ...prev, classificationLevel: parseInt(e.target.value) }))}
-            className={styles.select}
-          >
-            {availableLevels.map(level => (
-              <option key={level} value={level}>
-                Level {level} {level === 2 ? '(Restricted)' : level === 3 ? '(Confidential)' : level === 4 ? '(Secret)' : level === 5 ? '(Top Secret)' : ''}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className={styles.formGroup}>
-          <label>Description (optional)</label>
-          <input
-            type="text"
-            value={formData.description || ''}
-            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-            placeholder="Brief description of this classified content"
-            className={styles.input}
-          />
-        </div>
-
-        <div className={styles.formGroup}>
-          <label>Content</label>
-          <textarea
-            value={formData.content}
-            onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-            className={styles.textarea}
-            rows={3}
-          />
-        </div>
-
-        <div className={styles.modalActions}>
-          <button className={styles.cancelButton} onClick={onCancel}>
-            Cancel
-          </button>
-          <button 
-            className={styles.saveButton} 
-            onClick={handleSave}
-            disabled={!formData.key.trim()}
-          >
-            Save Secret
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}

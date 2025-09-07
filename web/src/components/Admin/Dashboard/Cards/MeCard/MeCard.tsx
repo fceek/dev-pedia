@@ -5,7 +5,12 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import styles from './MeCard.module.css'
 
-export default function MeCard() {
+interface CardProps {
+  isExpanded?: boolean
+  isPushedAway?: boolean
+}
+
+export default function MeCard({ isExpanded = false, isPushedAway = false }: CardProps) {
   const { user, classificationLevel, loadUserDetails } = useAuth()
   const { isDark, getConditionalClass } = useTheme()
   const [copied, setCopied] = useState(false)
@@ -52,7 +57,7 @@ export default function MeCard() {
   }
 
   return (
-    <div className={`${styles.meCard} ${getConditionalClass(styles, 'dark', isDark)}`}>
+    <div className={`${styles.meCard} ${getConditionalClass(styles, 'dark', isDark)} ${getConditionalClass(styles, 'pushedAway', isPushedAway)}`}>
       <div className={styles.cardHeader}>
         <div className={styles.typeLabel}>ME</div>
         <div className={styles.levelIndicator}>
@@ -89,7 +94,12 @@ export default function MeCard() {
       
       <div className={styles.stamp}>CLASSIFIED</div>
       
-
+      {/* Pushed Away Visual Hint */}
+      {isPushedAway && (
+        <div className={styles.pushedHint}>
+          <div className={styles.hintLabel}>ME</div>
+        </div>
+      )}
     </div>
   )
 }
