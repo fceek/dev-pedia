@@ -1,12 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { MarkdownHooks } from "react-markdown"
-import remarkGfm from 'remark-gfm'
-import rehypeStarryNight from 'rehype-starry-night'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
-import MarkdownEditor from './MarkdownEditor'
+import BlockEditor from './BlockEditor'
 import styles from './ArticleEditor.module.css'
 
 interface Secret {
@@ -43,11 +40,14 @@ interface ArticleEditorProps {
   className?: string
   isImmersive?: boolean
   onImmersiveToggle?: (immersive: boolean) => void
-  previewMode?: boolean
-  onPreviewToggle?: (preview: boolean) => void
   status?: 'draft' | 'published'
   onStatusChange?: (status: 'draft' | 'published') => void
-  onMakeSecret?: (makeSecretFn: () => void) => void
+  onMakeSecret?: (makeSecretFn: (level: number) => void) => void
+  onFormat?: (formatFn: (format: string) => void) => void
+  onActiveFormatsChange?: (formats: any) => void
+  onClassificationLevelChange?: (level: number | null) => void
+  onSelectedBlocksChange?: (count: number) => void
+  onDeleteBlocksAction?: (deleteFn: () => void) => void
 }
 
 export default function ArticleEditor({
@@ -58,22 +58,165 @@ export default function ArticleEditor({
   className = "",
   isImmersive = false,
   onImmersiveToggle,
-  previewMode: externalPreviewMode,
-  onPreviewToggle,
   status: externalStatus,
   onStatusChange,
-  onMakeSecret
+  onMakeSecret,
+  onFormat,
+  onActiveFormatsChange,
+  onClassificationLevelChange,
+  onSelectedBlocksChange,
+  onDeleteBlocksAction
 }: ArticleEditorProps) {
   const { classificationLevel } = useAuth()
   const { isDark, getConditionalClass } = useTheme()
   
+  const defaultContent = `# Complete Markdown Guide
+
+This article demonstrates all markdown features supported by the editor.
+
+## Headers
+
+Headers from H1 to H5 are supported:
+
+# Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+##### Heading 5
+
+## Text Formatting
+
+**Bold text** for emphasis.
+
+*Italic text* for subtle emphasis.
+
+***Bold and italic*** for maximum emphasis.
+
+~~Strikethrough text~~ for corrections.
+
+## Lists
+
+### Unordered Lists
+
+- First item
+- Second item
+  - Nested item
+  - Another nested item
+- Third item
+
+### Ordered Lists
+
+1. First step
+2. Second step
+3. Third step
+
+## Blockquotes
+
+> This is a blockquote.
+> It can span multiple lines.
+>
+> And include multiple paragraphs.
+
+## Code
+
+Inline code: \`const variable = "value"\`
+
+### Code Blocks
+
+\`\`\`javascript
+function greet(name) {
+  console.log(\`Hello, \${name}!\`)
+  return true
+}
+
+greet("World")
+\`\`\`
+
+\`\`\`python
+def calculate(x, y):
+    """Calculate something"""
+    result = x + y
+    return result
+\`\`\`
+
+## Tables
+
+| Feature | Supported | Notes |
+| -------- | -------- | -------- |
+| Headers | ✓ | H1-H5 |
+| Bold | ✓ | **text** |
+| Tables | ✓ | GFM tables |
+| Secrets | ✓ | {{2:classified content}} |
+
+## Callouts
+
+> [!info]
+> This is an informational callout with helpful context.
+
+> [!success]
+> Operation completed successfully!
+
+> [!warning]
+> Be careful with this operation.
+
+> [!error]
+> An error occurred during processing.
+
+> [!custom]
+> Custom callout with rainbow styling.
+
+## Inline Classification
+
+Public information is visible to everyone.
+
+{{2:This content requires Level 2 clearance to view.}}
+
+{{3:Level 3 classified information appears here.}}
+
+Normal text {{4:Level 4 secret}} and more normal text.
+
+{{5:Top secret Level 5 content with multiple words and sensitive data.}}
+
+## Links and Images
+
+[External link](https://example.com)
+
+[Internal link](/docs/getting-started)
+
+## Horizontal Rule
+
+---
+
+## Complex Example
+
+Here's a complex paragraph with **bold**, *italic*, ***both***, ~~strikethrough~~, \`inline code\`, and {{3:classified information}} all in one sentence.
+
+### Nested Lists with Code
+
+1. First, install dependencies:
+   \`\`\`bash
+   npm install
+   \`\`\`
+
+2. Then configure the settings:
+   - Edit \`config.json\`
+   - Set \`debug: false\`
+   - Add your API key
+
+3. Finally, run the application
+
+## End Notes
+
+This article covers all supported markdown features. Use the quick actions toolbar to format text easily!
+`
+
   const [articleData, setArticleData] = useState<ArticleData>({
     title: initialData?.title || '',
     fullPath: initialData?.fullPath || '',
     parentPath: initialData?.parentPath || '',
     classificationLevel: initialData?.classificationLevel || Math.min(classificationLevel, 2),
     status: initialData?.status || 'draft',
-    content: initialData?.content || '',
+    content: initialData?.content || defaultContent,
     secrets: initialData?.secrets || [],
     tags: initialData?.tags || [],
     description: initialData?.description || ''
@@ -81,19 +224,51 @@ export default function ArticleEditor({
   
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [internalPreviewMode, setInternalPreviewMode] = useState(false)
-  const previewMode = externalPreviewMode !== undefined ? externalPreviewMode : internalPreviewMode
-  const [makeSecretFn, setMakeSecretFn] = useState<(() => void) | null>(null)
+  const [makeSecretFn, setMakeSecretFn] = useState<((level: number) => void) | null>(null)
   const [isPathManuallyEdited, setIsPathManuallyEdited] = useState(!!initialData?.fullPath)
-  
-  // Handle preview mode changes
-  const handlePreviewToggle = (newPreviewMode: boolean) => {
-    if (onPreviewToggle) {
-      onPreviewToggle(newPreviewMode)
-    } else {
-      setInternalPreviewMode(newPreviewMode)
+  const [selectedBlockCount, setSelectedBlockCount] = useState(0)
+  const deleteBlocksFnRef = useRef<(() => void) | null>(null)
+
+  // Handle selected blocks change from BlockEditor
+  const handleSelectedBlocksChange = useCallback((count: number) => {
+    setSelectedBlockCount(count)
+    if (onSelectedBlocksChange) {
+      onSelectedBlocksChange(count)
     }
-  }
+  }, [onSelectedBlocksChange])
+
+  // Handle block action function (delete)
+  const handleBlockAction = useCallback((actionFn: () => void) => {
+    deleteBlocksFnRef.current = actionFn
+    if (onDeleteBlocksAction) {
+      onDeleteBlocksAction(actionFn)
+    }
+  }, [onDeleteBlocksAction])
+
+  // Delete selected blocks
+  const handleDeleteSelectedBlocks = useCallback(() => {
+    if (deleteBlocksFnRef.current) {
+      deleteBlocksFnRef.current()
+    }
+  }, [])
+
+  // Handle active block change from BlockEditor
+  const handleActiveBlockChange = useCallback((blockType: string, metadata?: any) => {
+    // Convert block type to active formats for toolbar
+    const formats: any = {}
+
+    if (blockType === 'heading' && metadata?.headingLevel) {
+      formats[`h${metadata.headingLevel}`] = true
+    }
+
+    if (onActiveFormatsChange) {
+      onActiveFormatsChange(formats)
+    }
+
+    if (onClassificationLevelChange && metadata?.classificationLevel) {
+      onClassificationLevelChange(metadata.classificationLevel)
+    }
+  }, [onActiveFormatsChange, onClassificationLevelChange])
 
   // Handle status changes
   const handleStatusChange = (newStatus: 'draft' | 'published') => {
@@ -107,28 +282,16 @@ export default function ArticleEditor({
   const [showTagInput, setShowTagInput] = useState(false)
   
   // Expose makeSecret function to parent
-  useEffect(() => {
-    if (onMakeSecret && makeSecretFn) {
-      onMakeSecret(makeSecretFn)
+  // This receives the function from MarkdownEditor via setMakeSecretFn prop
+  const handleSetMakeSecretFn = useCallback((fn: (level: number) => void) => {
+    setMakeSecretFn(() => fn) // Store in state
+    if (onMakeSecret) {
+      onMakeSecret(fn) // Immediately forward to parent
     }
-  }, [onMakeSecret, makeSecretFn])
+  }, [onMakeSecret])
 
   // Use external status if provided, otherwise use internal articleData.status
   const currentStatus = externalStatus !== undefined ? externalStatus : articleData.status
-
-  // Process markdown content for preview, handling secrets
-  const processContentForPreview = (content: string): string => {
-    return content.replace(/\{\{SECRET:([^}]+)\}\}/g, (match, key) => {
-      const secret = articleData.secrets.find(s => s.key === key)
-      if (!secret) {
-        return `**[MISSING SECRET: ${key}]**`
-      }
-      if (secret.classificationLevel > classificationLevel) {
-        return `**[CLASSIFIED - Level ${secret.classificationLevel}]**`
-      }
-      return secret.content
-    })
-  }
 
   // Get available classification levels (user can create articles up to their level)
   const getAvailableClassificationLevels = () => {
@@ -265,9 +428,7 @@ export default function ArticleEditor({
       )}
 
       <div className={styles.content}>
-        {!previewMode ? (
-          <>
-            {/* Article Metadata */}
+        {/* Article Metadata */}
             <div className={styles.metadata}>
               {/* Row 1: URL, Classification, Status */}
               <div className={styles.primaryRow}>
@@ -411,33 +572,47 @@ export default function ArticleEditor({
             {/* Content Editor Window */}
             <div className={styles.editorSection}>
               <div className={styles.contentWindow}>
-                {/* Title Bar */}
-                <div className={styles.titleBar}>
-                  <input
-                    id="title"
-                    type="text"
-                    value={articleData.title}
-                    onChange={(e) => updateArticleData('title', e.target.value)}
-                    placeholder="Article title"
-                    className={`${styles.titleInput} ${errors.title ? styles.error : ''}`}
-                    disabled={isLoading}
-                  />
-                  <div className={styles.titleBarInfo}>
-                    {articleData.secrets.length} secrets
-                  </div>
+                {/* Extracted title display */}
+                <div className={`${styles.extractedTitle} ${!articleData.title || !articleData.content.trimStart().startsWith('# ') ? styles.noTitle : ''}`}>
+                  {(() => {
+                    const firstLine = articleData.content.trimStart().split('\n')[0]
+                    if (!firstLine || !firstLine.startsWith('# ')) {
+                      return 'First block must be H1 heading'
+                    }
+                    // Convert title to slug format
+                    const title = firstLine.replace(/^#\s+/, '').trim()
+                    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+                    return slug ? `${slug}.md` : 'untitled.md'
+                  })()}
                 </div>
-                
-                {/* Content Area */}
-                <MarkdownEditor
+
+                {/* Content Area with inline title */}
+                <BlockEditor
                   value={articleData.content}
-                  onChange={(content) => updateArticleData('content', content)}
-                  secrets={articleData.secrets}
-                  onSecretsChange={(secrets) => updateArticleData('secrets', secrets)}
+                  onChange={(content) => {
+                    // Extract title from FIRST H1 only
+                    const firstLine = content.trimStart().split('\n')[0]
+                    if (firstLine && firstLine.startsWith('# ')) {
+                      const extractedTitle = firstLine.replace(/^#\s+/, '').trim()
+                      if (extractedTitle !== articleData.title) {
+                        updateArticleData('title', extractedTitle)
+                      }
+                    } else {
+                      // Clear title if first line is not H1
+                      if (articleData.title) {
+                        updateArticleData('title', '')
+                      }
+                    }
+                    updateArticleData('content', content)
+                  }}
                   className={errors.content || errors.secrets ? styles.error : ''}
-                  onMakeSecret={setMakeSecretFn}
+                  onFormat={onFormat}
+                  onActiveBlockChange={handleActiveBlockChange}
+                  onSelectedBlocksChange={handleSelectedBlocksChange}
+                  onBlockAction={handleBlockAction}
                 />
               </div>
-              
+
               {/* Error Messages */}
               {errors.title && <span className={styles.errorText}>{errors.title}</span>}
               {(errors.content || errors.secrets) && (
@@ -446,50 +621,6 @@ export default function ArticleEditor({
                 </span>
               )}
             </div>
-          </>
-        ) : (
-          /* Preview Mode */
-          <div className={styles.preview}>
-            <div className={styles.previewMetadata}>
-              <h1>{articleData.title || 'Untitled Article'}</h1>
-              <div className={styles.previewMeta}>
-                <span>Path: {articleData.fullPath}</span>
-                <span>Level: {articleData.classificationLevel}</span>
-                <span>Status: {currentStatus}</span>
-                {articleData.secrets.length > 0 && (
-                  <span>Secrets: {articleData.secrets.length}</span>
-                )}
-              </div>
-              {articleData.description && (
-                <p className={styles.previewDescription}>{articleData.description}</p>
-              )}
-              {articleData.tags.length > 0 && (
-                <div className={styles.previewTags}>
-                  {articleData.tags.map((tag, index) => (
-                    <span
-                      key={tag.id || index}
-                      className={styles.previewTag}
-                      style={{ backgroundColor: isDark ? (tag.darkColor || tag.color) : tag.color }}
-                    >
-                      {tag.name}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-            
-            <div className={styles.previewContent}>
-              <MarkdownHooks
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeStarryNight]}
-              >
-                {
-                  processContentForPreview(articleData.content)
-                }
-              </MarkdownHooks>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Actions */}

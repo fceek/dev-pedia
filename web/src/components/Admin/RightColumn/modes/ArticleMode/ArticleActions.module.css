@@ -96,11 +96,35 @@
     border: 0.0625rem solid var(--border-color);
     background: var(--accent-color);
     font-family: 'Google Sans Code', monospace;
-    overflow: hidden;
+    overflow: visible;
+}
+
+.compactActionButton > button {
+    flex: 1 1 0%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.compactActionButton > .dropdownWrapper {
+    position: relative;
+    display: flex;
+    overflow: visible;
+    flex: 1 1 0%;
+    min-width: 0;
+    box-sizing: border-box;
+    border: none;
+    border-right: 0.0625rem solid var(--border-color);
+    margin: 0;
+    padding: 0.375rem 0.5rem;
+    align-items: stretch;
+    box-shadow: inset 0 -0.375rem 0.5rem -0.25rem rgba(59, 130, 246, 0.8);
+}
+
+.articleActions.dark .compactActionButton > .dropdownWrapper {
+    box-shadow: inset 0 -0.375rem 0.5rem -0.25rem rgba(255, 193, 7, 0.9);
 }
 
 .compactActionButton button {
-    flex: 1;
     padding: 0.375rem 0.5rem;
     border: none;
     background: transparent;
@@ -110,9 +134,12 @@
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: inherit;
+    box-sizing: border-box;
+    white-space: nowrap;
+    text-align: center;
 }
 
-.compactActionButton button:not(:last-child) {
+.compactActionButton > button:not(:last-child) {
     border-right: 0.0625rem solid var(--border-color);
 }
 
@@ -177,6 +204,14 @@
     margin: 0.5rem 0;
 }
 
+/* Vertical divider for button groups */
+.verticalDivider {
+    width: 0.0625rem;
+    background: var(--border-color);
+    align-self: stretch;
+    flex: none;
+}
+
 /* Formatting controls section */
 .formattingSection {
     display: flex;
@@ -233,35 +268,91 @@
     background: rgba(255, 255, 255, 0.15);
 }
 
-/* Callout buttons with color tints */
-.compactActionButton button.calloutButton[data-callout="info"] {
+
+/* Dropdown button - fills the wrapper, no padding since wrapper has it */
+.compactActionButton > .dropdownWrapper .dropdownButton {
+    flex: 1;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--text-color);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Google Sans Code', monospace;
+    box-sizing: border-box;
+}
+
+.dropdownButton:hover {
+    background: var(--bg-color);
+}
+
+.dropdownMenu {
+    position: absolute;
+    top: 100%;
+    left: -0.0625rem;
+    right: -0.0625rem;
+    min-width: 8rem;
+    background: var(--accent-color);
+    border: 0.0625rem solid var(--border-color);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.3);
+}
+
+.dropdownItem {
+    padding: 0.375rem 0.5rem;
+    border: none;
+    background: transparent;
+    color: var(--text-color);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Google Sans Code', monospace;
+    text-align: left;
+    border-bottom: 0.0625rem solid var(--border-color);
+}
+
+.dropdownItem:last-child {
+    border-bottom: none;
+}
+
+.dropdownItem:hover {
+    background: var(--bg-color);
+}
+
+/* Callout dropdown items with color tints */
+.dropdownItem[data-callout="info"] {
     background: rgba(59, 130, 246, 0.25);
     color: rgb(30, 64, 175);
 }
 
-.compactActionButton button.calloutButton[data-callout="success"] {
+.dropdownItem[data-callout="success"] {
     background: rgba(34, 197, 94, 0.25);
     color: rgb(21, 128, 61);
 }
 
-.compactActionButton button.calloutButton[data-callout="warning"] {
+.dropdownItem[data-callout="warning"] {
     background: rgba(251, 191, 36, 0.3);
     color: rgb(146, 64, 14);
 }
 
-.compactActionButton button.calloutButton[data-callout="error"] {
+.dropdownItem[data-callout="error"] {
     background: rgba(239, 68, 68, 0.25);
     color: rgb(153, 27, 27);
 }
 
-.compactActionButton button.calloutButton[data-callout="custom"] {
-    background: linear-gradient(90deg, 
-        rgba(255, 0, 0, 0.15) 0%, 
-        rgba(255, 154, 0, 0.15) 16.67%, 
-        rgba(255, 206, 84, 0.15) 33.33%, 
-        rgba(0, 255, 0, 0.15) 50%, 
-        rgba(0, 150, 255, 0.15) 66.67%, 
-        rgba(119, 0, 255, 0.15) 83.33%, 
+.dropdownItem[data-callout="custom"] {
+    background: linear-gradient(90deg,
+        rgba(255, 0, 0, 0.15) 0%,
+        rgba(255, 154, 0, 0.15) 16.67%,
+        rgba(255, 206, 84, 0.15) 33.33%,
+        rgba(0, 255, 0, 0.15) 50%,
+        rgba(0, 150, 255, 0.15) 66.67%,
+        rgba(119, 0, 255, 0.15) 83.33%,
         rgba(255, 0, 150, 0.15) 100%);
     background-size: 200% 100%;
     animation: rainbow 3s linear infinite;
@@ -272,30 +363,30 @@
     100% { background-position: 200% 50%; }
 }
 
-/* Dark theme callout buttons */
-.articleActions.dark .compactActionButton button.calloutButton[data-callout="info"] {
+/* Dark theme dropdown items */
+.articleActions.dark .dropdownItem[data-callout="info"] {
     background: rgba(59, 130, 246, 0.2);
     color: rgb(147, 197, 253);
 }
 
-.articleActions.dark .compactActionButton button.calloutButton[data-callout="success"] {
+.articleActions.dark .dropdownItem[data-callout="success"] {
     background: rgba(34, 197, 94, 0.2);
     color: rgb(134, 239, 172);
 }
 
-.articleActions.dark .compactActionButton button.calloutButton[data-callout="warning"] {
+.articleActions.dark .dropdownItem[data-callout="warning"] {
     background: rgba(251, 191, 36, 0.2);
     color: rgb(254, 240, 138);
 }
 
-.articleActions.dark .compactActionButton button.calloutButton[data-callout="error"] {
+.articleActions.dark .dropdownItem[data-callout="error"] {
     background: rgba(239, 68, 68, 0.2);
     color: rgb(252, 165, 165);
 }
 
 /* Hover effects */
-.compactActionButton button.calloutButton:hover {
-    opacity: 0.8;
+.dropdownItem:hover {
+    opacity: 0.9;
 }
 
 
@@ -514,4 +605,37 @@
     background: var(--classification-5-dark);
     border-color: var(--classification-5-dark);
     color: white;
+}
+
+/* Block Controls - Compact label */
+.compactActionButton > .blockControlLabel {
+    flex: 0.6;
+    background: rgba(0, 0, 0, 0.15);
+    color: var(--text-color);
+    cursor: default;
+    pointer-events: none;
+    border-right: 0.0625rem solid var(--border-color);
+}
+
+.compactActionButton > .blockControlLabel:hover {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.articleActions.dark .compactActionButton > .blockControlLabel {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.articleActions.dark .compactActionButton > .blockControlLabel:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Block Controls - Compact delete button */
+.compactActionButton > .deleteButton {
+    flex: 1;
+    color: rgba(255, 100, 100, 0.9);
+}
+
+.compactActionButton > .deleteButton:disabled {
+    color: rgba(128, 128, 128, 0.4);
+    cursor: not-allowed;
 }

@@ -31,6 +31,19 @@ definitions:
       updated_by:
         type: string
     type: object
+  fceek_dev-pedia_backend_internal_models.ArticleClusterAssignment:
+    properties:
+      algorithm:
+        type: string
+      calculated_at:
+        type: string
+      centrality_score:
+        type: number
+      cluster_id:
+        type: integer
+      cluster_label:
+        type: string
+    type: object
   fceek_dev-pedia_backend_internal_models.ArticleListResponse:
     properties:
       articles:
@@ -110,6 +123,68 @@ definitions:
         type: string
       updated_by:
         type: string
+    type: object
+  fceek_dev-pedia_backend_internal_models.BacklinkSummary:
+    properties:
+      context_snippet:
+        type: string
+      created_at:
+        type: string
+      link_text:
+        type: string
+      source_article_id:
+        type: string
+      source_article_type:
+        $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.ArticleSourceType'
+      source_classification:
+        type: integer
+      source_path:
+        type: string
+      source_title:
+        type: string
+    type: object
+  fceek_dev-pedia_backend_internal_models.BrokenLink:
+    properties:
+      end_position:
+        description: Character position in content
+        type: integer
+      link_text:
+        description: The full [[...]] text
+        type: string
+      reason:
+        description: Why the link is broken
+        type: string
+      start_position:
+        description: Character position in content
+        type: integer
+      target_path:
+        description: The path that couldn't be resolved
+        type: string
+    type: object
+  fceek_dev-pedia_backend_internal_models.ClusterInfo:
+    properties:
+      algorithm:
+        type: string
+      avg_centrality:
+        type: number
+      cluster_id:
+        type: integer
+      density:
+        type: number
+      label:
+        type: string
+      representative_classification:
+        type: integer
+      representative_id:
+        type: string
+      representative_path:
+        type: string
+      representative_source_type:
+        $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.ArticleSourceType'
+      representative_title:
+        type: string
+      size:
+        type: integer
     type: object
   fceek_dev-pedia_backend_internal_models.CreateArticleRequest:
     properties:
@@ -196,6 +271,145 @@ definitions:
     required:
     - classification_level
     type: object
+  fceek_dev-pedia_backend_internal_models.GetBacklinksResponse:
+    properties:
+      backlinks:
+        items:
+          $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.BacklinkSummary'
+        type: array
+      total:
+        type: integer
+    type: object
+  fceek_dev-pedia_backend_internal_models.GetBrokenLinksResponse:
+    properties:
+      broken_links:
+        items:
+          $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.BrokenLink'
+        type: array
+      total:
+        type: integer
+    type: object
+  fceek_dev-pedia_backend_internal_models.GetClustersResponse:
+    properties:
+      algorithm:
+        type: string
+      clusters:
+        items:
+          $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.ClusterInfo'
+        type: array
+      total:
+        type: integer
+    type: object
+  fceek_dev-pedia_backend_internal_models.GetGraphResponse:
+    properties:
+      edges:
+        items:
+          $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.GraphEdge'
+        type: array
+      filtered_by:
+        description: Description of applied filters
+        type: string
+      nodes:
+        items:
+          $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.GraphNode'
+        type: array
+      stats:
+        $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.GraphStats'
+      user_classification:
+        description: User's classification level for client-side filtering
+        type: integer
+    type: object
+  fceek_dev-pedia_backend_internal_models.GraphEdge:
+    properties:
+      context_snippet:
+        type: string
+      id:
+        type: string
+      label:
+        description: link text
+        type: string
+      source:
+        description: source article ID
+        type: string
+      target:
+        description: target article ID
+        type: string
+      type:
+        description: '''wiki'', ''mention'', ''embed'''
+        type: string
+    type: object
+  fceek_dev-pedia_backend_internal_models.GraphNode:
+    properties:
+      classification_level:
+        type: integer
+      full_path:
+        type: string
+      id:
+        type: string
+      inbound_count:
+        description: Graph metrics
+        type: integer
+      is_authority:
+        type: boolean
+      is_hub:
+        type: boolean
+      is_orphan:
+        type: boolean
+      outbound_count:
+        type: integer
+      source_type:
+        $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.ArticleSourceType'
+      status:
+        $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.ArticleStatus'
+      tags:
+        description: Optional metadata
+        items:
+          $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.ArticleTag'
+        type: array
+      title:
+        type: string
+      total_degree:
+        type: integer
+    type: object
+  fceek_dev-pedia_backend_internal_models.GraphStats:
+    properties:
+      authorities_count:
+        type: integer
+      average_degree:
+        type: number
+      hubs_count:
+        type: integer
+      max_degree:
+        type: integer
+      nodes_by_classification:
+        additionalProperties:
+          type: integer
+        description: Classification breakdown
+        type: object
+      orphans_count:
+        type: integer
+      total_edges:
+        type: integer
+      total_nodes:
+        type: integer
+    type: object
+  fceek_dev-pedia_backend_internal_models.RunClusteringRequest:
+    properties:
+      algorithm:
+        description: '''label_propagation'', etc.'
+        type: string
+    type: object
+  fceek_dev-pedia_backend_internal_models.RunClusteringResponse:
+    properties:
+      algorithm:
+        type: string
+      cluster_count:
+        type: integer
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
   fceek_dev-pedia_backend_internal_models.TokenResponse:
     properties:
       classification_level:
@@ -254,6 +468,28 @@ definitions:
         type: array
       title:
         maxLength: 200
+        type: string
+    type: object
+  internal_handlers.ArticleSearchResponse:
+    properties:
+      suggestions:
+        items:
+          $ref: '#/definitions/internal_handlers.ArticleSuggestion'
+        type: array
+      total:
+        type: integer
+    type: object
+  internal_handlers.ArticleSuggestion:
+    properties:
+      classification_level:
+        type: integer
+      full_path:
+        type: string
+      id:
+        type: string
+      source_type:
+        type: string
+      title:
         type: string
     type: object
   internal_handlers.ErrorResponse:
@@ -512,6 +748,139 @@ paths:
       summary: Update article
       tags:
       - articles
+  /api/articles/{source_type}/{id}/backlinks:
+    get:
+      description: Get all articles that link to the specified article
+      parameters:
+      - description: Source type
+        enum:
+        - doc
+        - git
+        in: path
+        name: source_type
+        required: true
+        type: string
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.GetBacklinksResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get article backlinks
+      tags:
+      - graph
+  /api/articles/{source_type}/{id}/broken-links:
+    get:
+      description: Get all broken wiki links (non-existent or archived targets) in
+        the specified article
+      parameters:
+      - description: Source type
+        enum:
+        - doc
+        - git
+        in: path
+        name: source_type
+        required: true
+        type: string
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.GetBrokenLinksResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get broken links in an article
+      tags:
+      - graph
+  /api/articles/{source_type}/{id}/cluster:
+    get:
+      description: Get the cluster assignment for a specific article
+      parameters:
+      - description: Source type
+        enum:
+        - doc
+        - git
+        in: path
+        name: source_type
+        required: true
+        type: string
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: label_propagation
+        description: Clustering algorithm
+        in: query
+        name: algorithm
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.ArticleClusterAssignment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get article's cluster assignment
+      tags:
+      - clustering
   /api/articles/by-path:
     get:
       description: Get an article by its full path
@@ -557,6 +926,44 @@ paths:
       summary: Get article by path
       tags:
       - articles
+  /api/articles/search:
+    get:
+      description: Search articles by title or path for autocomplete
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        required: true
+        type: string
+      - default: 10
+        description: Result limit (max 50)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.ArticleSearchResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Search articles
+      tags:
+      - articles
   /api/bootstrap:
     post:
       consumes:
@@ -586,6 +993,197 @@ paths:
       summary: Create bootstrap token
       tags:
       - tokens
+  /api/graph:
+    get:
+      description: Get the complete knowledge graph filtered by user's classification
+        level
+      parameters:
+      - description: Minimum classification level
+        in: query
+        name: min_classification
+        type: integer
+      - description: Maximum classification level
+        in: query
+        name: max_classification
+        type: integer
+      - description: Comma-separated source types (doc,git)
+        in: query
+        name: source_types
+        type: string
+      - description: Only show hub nodes
+        in: query
+        name: only_hubs
+        type: boolean
+      - description: Only show authority nodes
+        in: query
+        name: only_authorities
+        type: boolean
+      - description: Only show orphan nodes
+        in: query
+        name: only_orphans
+        type: boolean
+      - description: Exclude orphan nodes
+        in: query
+        name: exclude_orphans
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.GetGraphResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get full knowledge graph
+      tags:
+      - graph
+  /api/graph/article/{source_type}/{id}:
+    get:
+      description: Get a subgraph centered on a specific article (N-hop neighborhood)
+      parameters:
+      - description: Source type
+        enum:
+        - doc
+        - git
+        in: path
+        name: source_type
+        required: true
+        type: string
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: 2
+        description: Depth of neighborhood (1-5)
+        in: query
+        name: depth
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.GetGraphResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get article neighborhood graph
+      tags:
+      - graph
+  /api/graph/clusters:
+    get:
+      description: Get all detected clusters/communities in the knowledge graph
+      parameters:
+      - default: label_propagation
+        description: Clustering algorithm
+        in: query
+        name: algorithm
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.GetClustersResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get graph clusters
+      tags:
+      - clustering
+  /api/graph/clusters/run:
+    post:
+      consumes:
+      - application/json
+      description: Detect communities in the knowledge graph using specified algorithm
+      parameters:
+      - description: Clustering request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.RunClusteringRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.RunClusteringResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Run clustering algorithm
+      tags:
+      - clustering
+  /api/graph/stats:
+    get:
+      description: Get overall statistics about the knowledge graph
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fceek_dev-pedia_backend_internal_models.GraphStats'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get graph statistics
+      tags:
+      - graph
   /api/me:
     get:
       description: Returns detailed information about the authenticated user including

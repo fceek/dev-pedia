@@ -1,0 +1,93 @@
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.loading,
+.error,
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-family: 'Google Sans Code', monospace;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.error {
+  color: var(--classification-3-light);
+}
+
+body.theme-dark .error {
+  color: var(--classification-3-dark);
+}
+
+.nodeInfo {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--bg-color);
+  border: 2px solid var(--border-color);
+  padding: 16px;
+  border-radius: 4px;
+  font-family: 'Google Sans Code', monospace;
+  font-size: 0.875rem;
+  max-width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.nodeInfo.dark {
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.nodeInfo h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.nodeInfo p {
+  margin: 8px 0;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+.nodeInfo button {
+  margin-top: 12px;
+  padding: 6px 12px;
+  background: var(--accent-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: 'Google Sans Code', monospace;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nodeInfo button:hover {
+  opacity: 0.8;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  margin: 4px 4px 4px 0;
+  background: var(--classification-4-light);
+  color: white;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+body.theme-dark .badge {
+  background: var(--classification-4-dark);
+}

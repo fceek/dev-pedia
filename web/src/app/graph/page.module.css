@@ -1,0 +1,168 @@
+.graphContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 24px;
+  font-family: 'Google Sans Code', monospace;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+}
+
+.controlButton {
+  padding: 8px 16px;
+  background: var(--accent-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: 'Google Sans Code', monospace;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.controlButton:hover {
+  opacity: 0.8;
+}
+
+.controlButton.active {
+  background: var(--text-color);
+  color: var(--bg-color);
+}
+
+.graphWrapper {
+  flex: 1;
+  min-height: 600px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.statsView {
+  flex: 1;
+  padding: 24px;
+  text-align: center;
+  color: var(--text-color);
+}
+
+.sidebar {
+  padding: 24px;
+  font-family: 'Google Sans Code', monospace;
+}
+
+.sidebar h3 {
+  margin: 0 0 16px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.legend {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.875rem;
+  color: var(--text-color);
+}
+
+.legendIcon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+}
+
+.level1 {
+  background: var(--classification-1-light);
+}
+
+.level2 {
+  background: var(--classification-2-light);
+}
+
+.level3 {
+  background: var(--classification-3-light);
+}
+
+.level4 {
+  background: var(--classification-4-light);
+}
+
+.level5 {
+  background: var(--classification-5-light);
+}
+
+body.theme-dark .level1 {
+  background: var(--classification-1-dark);
+}
+
+body.theme-dark .level2 {
+  background: var(--classification-2-dark);
+}
+
+body.theme-dark .level3 {
+  background: var(--classification-3-dark);
+}
+
+body.theme-dark .level4 {
+  background: var(--classification-4-dark);
+}
+
+body.theme-dark .level5 {
+  background: var(--classification-5-dark);
+}
+
+.controlsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.controlsList li {
+  font-size: 0.875rem;
+  color: var(--text-color);
+  opacity: 0.8;
+  padding-left: 16px;
+  position: relative;
+}
+
+.controlsList li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--classification-4-light);
+}
+
+body.theme-dark .controlsList li::before {
+  color: var(--classification-4-dark);
+}

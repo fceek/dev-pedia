@@ -1,0 +1,260 @@
+/* Editable Block Component Styles */
+
+.block {
+  min-height: 1.5rem;
+  cursor: text;
+  padding: 0.5rem;
+  padding-left: 1rem;
+  border-radius: 0.25rem;
+  transition: background 0.2s ease, border 0.2s ease;
+  border: 0.125rem solid transparent;
+  position: relative;
+}
+
+.block:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.block.dark:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Edit mode */
+.block.editing {
+  outline: 0.125rem solid var(--classification-1-light);
+  background: var(--accent-color);
+  border-color: var(--classification-1-light);
+}
+
+.block.dark.editing {
+  outline-color: var(--classification-1-dark);
+  border-color: var(--classification-1-dark);
+}
+
+/* Editable div (markdown input) */
+.editable {
+  font-family: 'Google Sans Code', monospace;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  outline: none;
+  min-height: 1.5rem;
+}
+
+.editable:empty::before {
+  content: 'Type here...';
+  color: var(--text-color);
+  opacity: 0.4;
+}
+
+/* Rendered div (HTML output) */
+.rendered {
+  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  cursor: text;
+}
+
+/* Block type specific styles */
+
+/* Headings */
+.block.heading .rendered h1,
+.block.heading .rendered h2,
+.block.heading .rendered h3,
+.block.heading .rendered h4,
+.block.heading .rendered h5 {
+  margin: 0;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.block.heading .rendered h1 { font-size: 2rem; }
+.block.heading .rendered h2 { font-size: 1.5rem; }
+.block.heading .rendered h3 { font-size: 1.25rem; }
+.block.heading .rendered h4 { font-size: 1.125rem; }
+.block.heading .rendered h5 { font-size: 1rem; }
+
+/* Lists */
+.block.list .rendered ul,
+.block.list .rendered ol {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.block.list .rendered li {
+  margin: 0.25rem 0;
+}
+
+/* Callouts */
+.block.callout .rendered blockquote {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-left: 0.25rem solid;
+  border-radius: 0.25rem;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.block.callout .rendered blockquote[data-callout="info"] {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.block.callout .rendered blockquote[data-callout="success"] {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.block.callout .rendered blockquote[data-callout="warning"] {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.block.callout .rendered blockquote[data-callout="error"] {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.block.callout .rendered blockquote[data-callout="custom"] {
+  border-image: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4) 1;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Tables */
+.block.table .rendered table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+.block.table .rendered th,
+.block.table .rendered td {
+  border: 0.0625rem solid var(--border-color);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.block.table .rendered th {
+  background: var(--accent-color);
+  font-weight: 600;
+}
+
+/* Code blocks */
+.block.codeblock .rendered pre {
+  margin: 0;
+  padding: 1rem;
+  background: var(--accent-color);
+  border: 0.0625rem solid var(--border-color);
+  border-radius: 0.25rem;
+  overflow-x: auto;
+}
+
+.block.codeblock .rendered code {
+  font-family: 'Google Sans Code', monospace;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+/* Quotes */
+.block.quote .rendered blockquote {
+  margin: 0;
+  padding-left: 1rem;
+  border-left: 0.25rem solid var(--border-color);
+  font-style: italic;
+  color: var(--text-color);
+  opacity: 0.9;
+}
+
+/* Inline classification */
+.rendered .secret-text {
+  font-weight: 600;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.1875rem;
+  font-family: 'Google Sans Code', monospace;
+}
+
+.rendered .secret-text.level-1 { color: var(--classification-1-light); }
+.rendered .secret-text.level-2 { color: var(--classification-2-light); }
+.rendered .secret-text.level-3 { color: var(--classification-3-light); }
+.rendered .secret-text.level-4 { color: var(--classification-4-light); }
+.rendered .secret-text.level-5 { color: var(--classification-5-light); }
+
+.block.dark .rendered .secret-text.level-1 { color: var(--classification-1-dark); }
+.block.dark .rendered .secret-text.level-2 { color: var(--classification-2-dark); }
+.block.dark .rendered .secret-text.level-3 { color: var(--classification-3-dark); }
+.block.dark .rendered .secret-text.level-4 { color: var(--classification-4-dark); }
+.block.dark .rendered .secret-text.level-5 { color: var(--classification-5-dark); }
+
+.rendered .secret-classified {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.1875rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Paragraph */
+.block.paragraph .rendered p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Empty placeholder */
+.rendered :global(.empty-placeholder) {
+  color: var(--text-color);
+  opacity: 0.4;
+  font-style: italic;
+  cursor: text;
+  margin: 0;
+  min-height: 1.5rem;
+}
+
+/* Strong and emphasis */
+.rendered strong {
+  font-weight: 700;
+}
+
+.rendered em {
+  font-style: italic;
+}
+
+.rendered del {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+/* Links */
+.rendered a {
+  color: var(--classification-4-light);
+  text-decoration: underline;
+}
+
+.block.dark .rendered a {
+  color: var(--classification-4-dark);
+}
+
+/* Wiki links */
+.rendered .wiki-link {
+  color: var(--classification-4-light);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.rendered .wiki-link:hover {
+  text-decoration: underline;
+}
+
+.block.dark .rendered .wiki-link {
+  color: var(--classification-4-dark);
+}
+
+.rendered .broken-link {
+  color: #ef4444;
+  text-decoration: underline wavy;
+  cursor: help;
+}

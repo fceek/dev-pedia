@@ -11,11 +11,15 @@ import (
 )
 
 type ArticleService struct {
-	db *sql.DB
+	db          *sql.DB
+	linkService *LinkService
 }
 
 func NewArticleService(db *sql.DB) *ArticleService {
-	return &ArticleService{db: db}
+	return &ArticleService{
+		db:          db,
+		linkService: NewLinkService(db),
+	}
 }
 
 // Create creates a new article with optional content secrets
@@ -92,6 +96,15 @@ func (s *ArticleService) Create(req *models.CreateArticleRequest, userToken *mod
 		err = s.addSecretsToArticle(tx, articleID, req.SourceType, req.Secrets, userToken)
 		if err != nil {
 			return nil, fmt.Errorf("failed to add secrets: %w", err)
+		}
+	}
+
+	// Extract and save wiki-style links from content
+	links := s.linkService.ExtractLinksFromContent(req.Content)
+	if len(links) > 0 {
+		err = s.linkService.SaveLinks(tx, articleID, req.SourceType, links, req.Content)
+		if err != nil {
+			return nil, fmt.Errorf("failed to save links: %w", err)
 		}
 	}
 
@@ -444,7 +457,7 @@ func (s *ArticleService) Update(sourceType models.ArticleSourceType, id uuid.UUI
 	if req.Secrets != nil {
 		// Remove existing secrets
 		_, err = tx.Exec(`
-			DELETE FROM article_content_secrets 
+			DELETE FROM article_content_secrets
 			WHERE article_source_type = $1 AND article_id = $2
 		`, sourceType, id)
 		if err != nil {
@@ -460,11 +473,69 @@ func (s *ArticleService) Update(sourceType models.ArticleSourceType, id uuid.UUI
 		}
 	}
 
+	// Update links if content changed
+	if req.Content != nil {
+		links := s.linkService.ExtractLinksFromContent(*req.Content)
+		err = s.linkService.SaveLinks(tx, id, sourceType, links, *req.Content)
+		if err != nil {
+			return nil, fmt.Errorf("failed to update links: %w", err)
+		}
+	}
+
 	if err = tx.Commit(); err != nil {
 		return nil, fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
 	return current, nil
+}
+
+// SearchByTitleOrPath searches for articles by title or path (for autocomplete)
+func (s *ArticleService) SearchByTitleOrPath(query string, userClassificationLevel int, limit int) ([]models.Article, error) {
+	if limit <= 0 || limit > 50 {
+		limit = 10
+	}
+
+	// Use ILIKE for case-insensitive fuzzy search
+	searchQuery := `
+		SELECT id, source_type, title, full_path, classification_level, status
+		FROM articles
+		WHERE classification_level <= $1
+		  AND status IN ('draft', 'published')
+		  AND (title ILIKE $2 OR full_path ILIKE $2)
+		ORDER BY
+			CASE
+				WHEN title ILIKE $3 THEN 1  -- Exact match gets highest priority
+				WHEN title ILIKE $2 THEN 2  -- Starts with match
+				ELSE 3                       -- Contains match
+			END,
+			classification_level ASC,       -- Lower classification first
+			title ASC
+		LIMIT $4
+	`
+
+	searchPattern := "%" + query + "%"
+	exactPattern := query + "%"
+
+	rows, err := s.db.Query(searchQuery, userClassificationLevel, searchPattern, exactPattern, limit)
+	if err != nil {
+		return nil, fmt.Errorf("failed to search articles: %w", err)
+	}
+	defer rows.Close()
+
+	articles := []models.Article{}
+	for rows.Next() {
+		var article models.Article
+		err := rows.Scan(
+			&article.ID, &article.SourceType, &article.Title,
+			&article.FullPath, &article.ClassificationLevel, &article.Status,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan article: %w", err)
+		}
+		articles = append(articles, article)
+	}
+
+	return articles, nil
 }
 
 // Delete deletes an article

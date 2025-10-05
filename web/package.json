@@ -9,12 +9,18 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "fuse.js": "^7.1.0",
+    "nanoid": "^5.1.6",
     "next": "15.5.1",
     "react": "19.1.1",
     "react-dom": "19.1.1",
+    "react-force-graph-2d": "^1.29.0",
     "react-markdown": "^10.1.0",
     "rehype-starry-night": "^2.2.0",
+    "remark": "^15.0.1",
     "remark-gfm": "^4.0.1",
+    "remark-html": "^16.0.1",
+    "remark-wiki-link": "^2.0.1",
     "sass": "^1.90.0"
   },
   "devDependencies": {

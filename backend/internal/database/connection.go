@@ -53,6 +53,9 @@ func (db *DB) InitializeSchema(sqlDir string) error {
 		"02_audit_logging.sql",
 		"03_article_engine.sql",
 		"04_content_secrets.sql",
+		"05_article_links.sql",
+		"06_graph_analytics.sql",
+		"07_link_strength.sql",
 	}
 
 	for _, filename := range sqlFiles {

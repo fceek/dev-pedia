@@ -19,13 +19,18 @@ interface DashboardProps {
   onImmersiveToggle?: (immersive: boolean) => void
   previewMode?: boolean
   onPreviewToggle?: (preview: boolean) => void
-  onMakeSecret?: (makeSecretFn: () => void) => void
+  onMakeSecret?: (makeSecretFn: (level: number) => void) => void
   status?: 'draft' | 'published'
   onStatusChange?: (status: 'draft' | 'published') => void
   onModeChange?: (mode: AdminMode) => void
+  onFormat?: (formatFn: (format: string) => void) => void
+  onActiveFormatsChange?: (formats: any) => void
+  onClassificationLevelChange?: (level: number | null) => void
+  onSelectedBlocksChange?: (count: number) => void
+  onDeleteBlocksAction?: (deleteFn: () => void) => void
 }
 
-export default function Dashboard({ mode, isImmersive = false, onImmersiveToggle, previewMode = false, onPreviewToggle, onMakeSecret, status, onStatusChange, onModeChange }: DashboardProps) {
+export default function Dashboard({ mode, isImmersive = false, onImmersiveToggle, previewMode = false, onPreviewToggle, onMakeSecret, status, onStatusChange, onModeChange, onFormat, onActiveFormatsChange, onClassificationLevelChange, onSelectedBlocksChange, onDeleteBlocksAction }: DashboardProps) {
   const { isDark, getConditionalClass } = useTheme()
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [isFadingOut, setIsFadingOut] = useState(false)
@@ -179,6 +184,11 @@ export default function Dashboard({ mode, isImmersive = false, onImmersiveToggle
             onMakeSecret={onMakeSecret}
             status={status}
             onStatusChange={onStatusChange}
+            onFormat={onFormat}
+            onActiveFormatsChange={onActiveFormatsChange}
+            onClassificationLevelChange={onClassificationLevelChange}
+            onSelectedBlocksChange={onSelectedBlocksChange}
+            onDeleteBlocksAction={onDeleteBlocksAction}
           />
         )}
         {mode === 'integration' && <IntegrationCard isExpanded={true} />}

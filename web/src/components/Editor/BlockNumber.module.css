@@ -1,0 +1,46 @@
+/* Block Number Component - Similar to code editor line numbers with breakpoint indicator */
+
+.blockNumber {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.5rem 0.5rem 0.5rem 0.25rem;
+  font-family: 'Google Sans Code', monospace;
+  font-size: 0.75rem;
+  color: var(--text-color);
+  opacity: 0.4;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.1s ease;
+  position: relative;
+  width: 2rem;
+}
+
+.blockNumber:hover {
+  opacity: 0.6;
+}
+
+.numberDisplay {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* Breakpoint-style indicator - solid background when selected */
+.blockNumber.selected {
+  background: var(--classification-4-light);
+  opacity: 1;
+}
+
+.blockNumber.selected .numberDisplay {
+  color: white;
+}
+
+/* Dark theme */
+.blockNumber.dark.selected {
+  background: var(--classification-4-dark);
+}
+
+.blockNumber.dark.selected .numberDisplay {
+  color: white;
+}

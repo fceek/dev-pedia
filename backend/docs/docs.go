@@ -233,6 +233,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/articles/search": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Search articles by title or path for autocomplete",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "summary": "Search articles",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "q",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Result limit (max 50)",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ArticleSearchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/articles/{source_type}/{id}": {
             "get": {
                 "security": [
@@ -454,6 +513,208 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/articles/{source_type}/{id}/backlinks": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all articles that link to the specified article",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "graph"
+                ],
+                "summary": "Get article backlinks",
+                "parameters": [
+                    {
+                        "enum": [
+                            "doc",
+                            "git"
+                        ],
+                        "type": "string",
+                        "description": "Source type",
+                        "name": "source_type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.GetBacklinksResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/articles/{source_type}/{id}/broken-links": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all broken wiki links (non-existent or archived targets) in the specified article",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "graph"
+                ],
+                "summary": "Get broken links in an article",
+                "parameters": [
+                    {
+                        "enum": [
+                            "doc",
+                            "git"
+                        ],
+                        "type": "string",
+                        "description": "Source type",
+                        "name": "source_type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.GetBrokenLinksResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/articles/{source_type}/{id}/cluster": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get the cluster assignment for a specific article",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clustering"
+                ],
+                "summary": "Get article's cluster assignment",
+                "parameters": [
+                    {
+                        "enum": [
+                            "doc",
+                            "git"
+                        ],
+                        "type": "string",
+                        "description": "Source type",
+                        "name": "source_type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "label_propagation",
+                        "description": "Clustering algorithm",
+                        "name": "algorithm",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.ArticleClusterAssignment"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/bootstrap": {
             "post": {
                 "security": [
@@ -495,6 +756,303 @@ const docTemplate = `{
                             "additionalProperties": {
                                 "type": "string"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/graph": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get the complete knowledge graph filtered by user's classification level",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "graph"
+                ],
+                "summary": "Get full knowledge graph",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Minimum classification level",
+                        "name": "min_classification",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Maximum classification level",
+                        "name": "max_classification",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated source types (doc,git)",
+                        "name": "source_types",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Only show hub nodes",
+                        "name": "only_hubs",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Only show authority nodes",
+                        "name": "only_authorities",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Only show orphan nodes",
+                        "name": "only_orphans",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Exclude orphan nodes",
+                        "name": "exclude_orphans",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.GetGraphResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/graph/article/{source_type}/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get a subgraph centered on a specific article (N-hop neighborhood)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "graph"
+                ],
+                "summary": "Get article neighborhood graph",
+                "parameters": [
+                    {
+                        "enum": [
+                            "doc",
+                            "git"
+                        ],
+                        "type": "string",
+                        "description": "Source type",
+                        "name": "source_type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Article ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 2,
+                        "description": "Depth of neighborhood (1-5)",
+                        "name": "depth",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.GetGraphResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/graph/clusters": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all detected clusters/communities in the knowledge graph",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clustering"
+                ],
+                "summary": "Get graph clusters",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "label_propagation",
+                        "description": "Clustering algorithm",
+                        "name": "algorithm",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.GetClustersResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/graph/clusters/run": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Detect communities in the knowledge graph using specified algorithm",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clustering"
+                ],
+                "summary": "Run clustering algorithm",
+                "parameters": [
+                    {
+                        "description": "Clustering request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.RunClusteringRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.RunClusteringResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/graph/stats": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get overall statistics about the knowledge graph",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "graph"
+                ],
+                "summary": "Get graph statistics",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.GraphStats"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.ErrorResponse"
                         }
                     }
                 }
@@ -963,6 +1521,26 @@ const docTemplate = `{
                 }
             }
         },
+        "fceek_dev-pedia_backend_internal_models.ArticleClusterAssignment": {
+            "type": "object",
+            "properties": {
+                "algorithm": {
+                    "type": "string"
+                },
+                "calculated_at": {
+                    "type": "string"
+                },
+                "centrality_score": {
+                    "type": "number"
+                },
+                "cluster_id": {
+                    "type": "integer"
+                },
+                "cluster_label": {
+                    "type": "string"
+                }
+            }
+        },
         "fceek_dev-pedia_backend_internal_models.ArticleListResponse": {
             "type": "object",
             "properties": {
@@ -1078,6 +1656,98 @@ const docTemplate = `{
                 },
                 "updated_by": {
                     "type": "string"
+                }
+            }
+        },
+        "fceek_dev-pedia_backend_internal_models.BacklinkSummary": {
+            "type": "object",
+            "properties": {
+                "context_snippet": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "link_text": {
+                    "type": "string"
+                },
+                "source_article_id": {
+                    "type": "string"
+                },
+                "source_article_type": {
+                    "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.ArticleSourceType"
+                },
+                "source_classification": {
+                    "type": "integer"
+                },
+                "source_path": {
+                    "type": "string"
+                },
+                "source_title": {
+                    "type": "string"
+                }
+            }
+        },
+        "fceek_dev-pedia_backend_internal_models.BrokenLink": {
+            "type": "object",
+            "properties": {
+                "end_position": {
+                    "description": "Character position in content",
+                    "type": "integer"
+                },
+                "link_text": {
+                    "description": "The full [[...]] text",
+                    "type": "string"
+                },
+                "reason": {
+                    "description": "Why the link is broken",
+                    "type": "string"
+                },
+                "start_position": {
+                    "description": "Character position in content",
+                    "type": "integer"
+                },
+                "target_path": {
+                    "description": "The path that couldn't be resolved",
+                    "type": "string"
+                }
+            }
+        },
+        "fceek_dev-pedia_backend_internal_models.ClusterInfo": {
+            "type": "object",
+            "properties": {
+                "algorithm": {
+                    "type": "string"
+                },
+                "avg_centrality": {
+                    "type": "number"
+                },
+                "cluster_id": {
+                    "type": "integer"
+                },
+                "density": {
+                    "type": "number"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "representative_classification": {
+                    "type": "integer"
+                },
+                "representative_id": {
+                    "type": "string"
+                },
+                "representative_path": {
+                    "type": "string"
+                },
+                "representative_source_type": {
+                    "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.ArticleSourceType"
+                },
+                "representative_title": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
                 }
             }
         },
@@ -1204,6 +1874,214 @@ const docTemplate = `{
                 }
             }
         },
+        "fceek_dev-pedia_backend_internal_models.GetBacklinksResponse": {
+            "type": "object",
+            "properties": {
+                "backlinks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.BacklinkSummary"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "fceek_dev-pedia_backend_internal_models.GetBrokenLinksResponse": {
+            "type": "object",
+            "properties": {
+                "broken_links": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.BrokenLink"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "fceek_dev-pedia_backend_internal_models.GetClustersResponse": {
+            "type": "object",
+            "properties": {
+                "algorithm": {
+                    "type": "string"
+                },
+                "clusters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.ClusterInfo"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "fceek_dev-pedia_backend_internal_models.GetGraphResponse": {
+            "type": "object",
+            "properties": {
+                "edges": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.GraphEdge"
+                    }
+                },
+                "filtered_by": {
+                    "description": "Description of applied filters",
+                    "type": "string"
+                },
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.GraphNode"
+                    }
+                },
+                "stats": {
+                    "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.GraphStats"
+                },
+                "user_classification": {
+                    "description": "User's classification level for client-side filtering",
+                    "type": "integer"
+                }
+            }
+        },
+        "fceek_dev-pedia_backend_internal_models.GraphEdge": {
+            "type": "object",
+            "properties": {
+                "context_snippet": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "description": "link text",
+                    "type": "string"
+                },
+                "source": {
+                    "description": "source article ID",
+                    "type": "string"
+                },
+                "target": {
+                    "description": "target article ID",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "'wiki', 'mention', 'embed'",
+                    "type": "string"
+                }
+            }
+        },
+        "fceek_dev-pedia_backend_internal_models.GraphNode": {
+            "type": "object",
+            "properties": {
+                "classification_level": {
+                    "type": "integer"
+                },
+                "full_path": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "inbound_count": {
+                    "description": "Graph metrics",
+                    "type": "integer"
+                },
+                "is_authority": {
+                    "type": "boolean"
+                },
+                "is_hub": {
+                    "type": "boolean"
+                },
+                "is_orphan": {
+                    "type": "boolean"
+                },
+                "outbound_count": {
+                    "type": "integer"
+                },
+                "source_type": {
+                    "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.ArticleSourceType"
+                },
+                "status": {
+                    "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.ArticleStatus"
+                },
+                "tags": {
+                    "description": "Optional metadata",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fceek_dev-pedia_backend_internal_models.ArticleTag"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "total_degree": {
+                    "type": "integer"
+                }
+            }
+        },
+        "fceek_dev-pedia_backend_internal_models.GraphStats": {
+            "type": "object",
+            "properties": {
+                "authorities_count": {
+                    "type": "integer"
+                },
+                "average_degree": {
+                    "type": "number"
+                },
+                "hubs_count": {
+                    "type": "integer"
+                },
+                "max_degree": {
+                    "type": "integer"
+                },
+                "nodes_by_classification": {
+                    "description": "Classification breakdown",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "orphans_count": {
+                    "type": "integer"
+                },
+                "total_edges": {
+                    "type": "integer"
+                },
+                "total_nodes": {
+                    "type": "integer"
+                }
+            }
+        },
+        "fceek_dev-pedia_backend_internal_models.RunClusteringRequest": {
+            "type": "object",
+            "properties": {
+                "algorithm": {
+                    "description": "'label_propagation', etc.",
+                    "type": "string"
+                }
+            }
+        },
+        "fceek_dev-pedia_backend_internal_models.RunClusteringResponse": {
+            "type": "object",
+            "properties": {
+                "algorithm": {
+                    "type": "string"
+                },
+                "cluster_count": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
         "fceek_dev-pedia_backend_internal_models.TokenResponse": {
             "type": "object",
             "properties": {
@@ -1290,6 +2168,40 @@ const docTemplate = `{
                 "title": {
                     "type": "string",
                     "maxLength": 200
+                }
+            }
+        },
+        "internal_handlers.ArticleSearchResponse": {
+            "type": "object",
+            "properties": {
+                "suggestions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_handlers.ArticleSuggestion"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "internal_handlers.ArticleSuggestion": {
+            "type": "object",
+            "properties": {
+                "classification_level": {
+                    "type": "integer"
+                },
+                "full_path": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "source_type": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },

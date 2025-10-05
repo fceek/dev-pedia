@@ -69,6 +69,8 @@ func main() {
 	tokenService := auth.NewTokenService(db)
 	authMiddleware := middleware.NewAuthMiddleware(tokenService)
 	articleService := services.NewArticleService(db.DB)
+	linkService := services.NewLinkService(db.DB)
+	clusterService := services.NewClusterService(db.DB, linkService)
 
 	// Initialize jobs and scheduler
 	tokenExpirationJob := jobs.NewTokenExpirationJob(db)
@@ -82,6 +84,8 @@ func main() {
 	routes.SetupHealthRoutes(mux)
 	routes.SetupTokenRoutes(mux, tokenService, authMiddleware)
 	routes.SetupArticleRoutes(mux, articleService, authMiddleware)
+	routes.SetupGraphRoutes(mux, linkService, authMiddleware)
+	routes.SetupClusterRoutes(mux, clusterService, authMiddleware)
 
 	// Add Swagger documentation endpoint
 	// Use relative URL so it works with Docker port mapping

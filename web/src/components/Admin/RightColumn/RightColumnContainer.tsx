@@ -23,16 +23,16 @@ interface RightColumnContainerProps {
   onPreviewToggle?: (preview: boolean) => void
   status?: 'draft' | 'published'
   onStatusChange?: (status: 'draft' | 'published') => void
-  onMakeSecret?: () => void
+  onMakeSecret?: (level: number) => void
+  onFormat?: (format: string) => void
+  activeFormats?: any
+  currentClassificationLevel?: number | null
+  selectedBlockCount?: number
+  onDeleteSelectedBlocks?: () => void
 }
 
-export default function RightColumnContainer({ mode, data, isImmersive, onImmersiveToggle, previewMode, onPreviewToggle, status, onStatusChange, onMakeSecret }: RightColumnContainerProps) {
+export default function RightColumnContainer({ mode, data, isImmersive, onImmersiveToggle, previewMode, onPreviewToggle, status, onStatusChange, onMakeSecret, onFormat, activeFormats, currentClassificationLevel, selectedBlockCount, onDeleteSelectedBlocks }: RightColumnContainerProps) {
   const { isDark, getConditionalClass } = useTheme()
-
-  const handleFormat = (format: string) => {
-    console.log('Format action:', format)
-    // TODO: Implement actual formatting logic
-  }
 
   const getTreeSections = () => {
     switch (mode) {
@@ -54,7 +54,7 @@ export default function RightColumnContainer({ mode, data, isImmersive, onImmers
     switch (mode) {
       case 'article':
         return (
-          <ArticleActions 
+          <ArticleActions
             isPreview={previewMode}
             onPreviewToggle={onPreviewToggle}
             isImmersive={isImmersive}
@@ -62,7 +62,11 @@ export default function RightColumnContainer({ mode, data, isImmersive, onImmers
             status={status}
             onStatusChange={onStatusChange}
             onMakeSecret={onMakeSecret}
-            onFormat={handleFormat}
+            onFormat={onFormat}
+            activeFormats={activeFormats}
+            currentClassificationLevel={currentClassificationLevel}
+            selectedBlockCount={selectedBlockCount}
+            onDeleteSelectedBlocks={onDeleteSelectedBlocks}
           />
         )
       case 'dashboard':

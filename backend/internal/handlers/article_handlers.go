@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"fceek/dev-pedia/backend/internal/auth"
+	"fceek/dev-pedia/backend/internal/middleware"
 	"fceek/dev-pedia/backend/internal/models"
 	"fceek/dev-pedia/backend/internal/services"
 	"github.com/google/uuid"
@@ -37,12 +38,13 @@ func NewArticleHandler(articleService *services.ArticleService) *ArticleHandler 
 // @Security Bearer
 // @Router /api/articles [post]
 func (h *ArticleHandler) CreateArticle(w http.ResponseWriter, r *http.Request) {
-	// Get authenticated token from context
-	token, ok := r.Context().Value("token").(*models.Token)
+	// Get auth context
+	authCtx, ok := middleware.GetAuthContext(r)
 	if !ok {
 		http.Error(w, "Authentication required", http.StatusUnauthorized)
 		return
 	}
+	token := authCtx.Token
 
 	var req models.CreateArticleRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -81,12 +83,13 @@ func (h *ArticleHandler) CreateArticle(w http.ResponseWriter, r *http.Request) {
 // @Security Bearer
 // @Router /api/articles/{source_type}/{id} [get]
 func (h *ArticleHandler) GetArticle(w http.ResponseWriter, r *http.Request) {
-	// Get authenticated token from context
-	token, ok := r.Context().Value("token").(*models.Token)
+	// Get auth context
+	authCtx, ok := middleware.GetAuthContext(r)
 	if !ok {
 		http.Error(w, "Authentication required", http.StatusUnauthorized)
 		return
 	}
+	token := authCtx.Token
 
 	// Parse source type
 	sourceTypeStr := r.PathValue("source_type")
@@ -145,12 +148,13 @@ func (h *ArticleHandler) GetArticle(w http.ResponseWriter, r *http.Request) {
 // @Security Bearer
 // @Router /api/articles/by-path [get]
 func (h *ArticleHandler) GetArticleByPath(w http.ResponseWriter, r *http.Request) {
-	// Get authenticated token from context
-	token, ok := r.Context().Value("token").(*models.Token)
+	// Get auth context
+	authCtx, ok := middleware.GetAuthContext(r)
 	if !ok {
 		http.Error(w, "Authentication required", http.StatusUnauthorized)
 		return
 	}
+	token := authCtx.Token
 
 	// Parse query parameters
 	sourceTypeStr := r.URL.Query().Get("source_type")
@@ -209,12 +213,13 @@ func (h *ArticleHandler) GetArticleByPath(w http.ResponseWriter, r *http.Request
 // @Security Bearer
 // @Router /api/articles [get]
 func (h *ArticleHandler) ListArticles(w http.ResponseWriter, r *http.Request) {
-	// Get authenticated token from context
-	token, ok := r.Context().Value("token").(*models.Token)
+	// Get auth context
+	authCtx, ok := middleware.GetAuthContext(r)
 	if !ok {
 		http.Error(w, "Authentication required", http.StatusUnauthorized)
 		return
 	}
+	token := authCtx.Token
 
 	// Parse query parameters
 	var sourceType *models.ArticleSourceType
@@ -286,12 +291,13 @@ func (h *ArticleHandler) ListArticles(w http.ResponseWriter, r *http.Request) {
 // @Security Bearer
 // @Router /api/articles/{source_type}/{id} [put]
 func (h *ArticleHandler) UpdateArticle(w http.ResponseWriter, r *http.Request) {
-	// Get authenticated token from context
-	token, ok := r.Context().Value("token").(*models.Token)
+	// Get auth context
+	authCtx, ok := middleware.GetAuthContext(r)
 	if !ok {
 		http.Error(w, "Authentication required", http.StatusUnauthorized)
 		return
 	}
+	token := authCtx.Token
 
 	// Parse source type
 	sourceTypeStr := r.PathValue("source_type")
@@ -356,12 +362,13 @@ func (h *ArticleHandler) UpdateArticle(w http.ResponseWriter, r *http.Request) {
 // @Security Bearer
 // @Router /api/articles/{source_type}/{id} [delete]
 func (h *ArticleHandler) DeleteArticle(w http.ResponseWriter, r *http.Request) {
-	// Get authenticated token from context
-	token, ok := r.Context().Value("token").(*models.Token)
+	// Get auth context
+	authCtx, ok := middleware.GetAuthContext(r)
 	if !ok {
 		http.Error(w, "Authentication required", http.StatusUnauthorized)
 		return
 	}
+	token := authCtx.Token
 
 	// Use centralized authorization
 	if err := h.authorizer.ValidateDeleteRequest(token); err != nil {
@@ -396,6 +403,85 @@ func (h *ArticleHandler) DeleteArticle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// @Summary Search articles
+// @Description Search articles by title or path for autocomplete
+// @Tags articles
+// @Produce json
+// @Param q query string true "Search query"
+// @Param limit query int false "Result limit (max 50)" default(10)
+// @Success 200 {object} ArticleSearchResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Security Bearer
+// @Router /api/articles/search [get]
+func (h *ArticleHandler) SearchArticles(w http.ResponseWriter, r *http.Request) {
+	// Get auth context
+	authCtx, ok := middleware.GetAuthContext(r)
+	if !ok {
+		http.Error(w, "Authentication required", http.StatusUnauthorized)
+		return
+	}
+	token := authCtx.Token
+
+	// Parse query parameter
+	query := r.URL.Query().Get("q")
+	if query == "" {
+		http.Error(w, "Missing query parameter 'q'", http.StatusBadRequest)
+		return
+	}
+
+	// Parse limit parameter
+	limit := 10
+	if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			limit = l
+		}
+	}
+
+	// Search articles
+	articles, err := h.articleService.SearchByTitleOrPath(query, token.ClassificationLevel, limit)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Build response with simplified article data for autocomplete
+	suggestions := make([]ArticleSuggestion, 0, len(articles))
+	for _, article := range articles {
+		suggestions = append(suggestions, ArticleSuggestion{
+			ID:                  article.ID.String(),
+			SourceType:          string(article.SourceType),
+			Title:               article.Title,
+			FullPath:            article.FullPath,
+			ClassificationLevel: article.ClassificationLevel,
+		})
+	}
+
+	response := ArticleSearchResponse{
+		Suggestions: suggestions,
+		Total:       len(suggestions),
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+// ArticleSuggestion represents a search suggestion for autocomplete
+type ArticleSuggestion struct {
+	ID                  string `json:"id"`
+	SourceType          string `json:"source_type"`
+	Title               string `json:"title"`
+	FullPath            string `json:"full_path"`
+	ClassificationLevel int    `json:"classification_level"`
+}
+
+// ArticleSearchResponse represents the search response
+type ArticleSearchResponse struct {
+	Suggestions []ArticleSuggestion `json:"suggestions"`
+	Total       int                 `json:"total"`
 }
 
 // ErrorResponse represents an error response

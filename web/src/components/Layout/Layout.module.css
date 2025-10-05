@@ -69,12 +69,14 @@
 .leftColumn {
     grid-area: leftColumn;
     height: 100%;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .rightColumn {
     grid-area: rightColumn;
     min-width: 0;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 

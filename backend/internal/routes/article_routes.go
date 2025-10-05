@@ -15,6 +15,7 @@ func SetupArticleRoutes(mux *http.ServeMux, articleService *services.ArticleServ
 	// Article CRUD routes with authentication
 	mux.Handle("POST /api/articles", authMiddleware.RequireAuth()(http.HandlerFunc(articleHandler.CreateArticle)))
 	mux.Handle("GET /api/articles", authMiddleware.RequireAuth()(http.HandlerFunc(articleHandler.ListArticles)))
+	mux.Handle("GET /api/articles/search", authMiddleware.RequireAuth()(http.HandlerFunc(articleHandler.SearchArticles)))
 	mux.Handle("GET /api/articles/by-path", authMiddleware.RequireAuth()(http.HandlerFunc(articleHandler.GetArticleByPath)))
 	mux.Handle("GET /api/articles/{source_type}/{id}", authMiddleware.RequireAuth()(http.HandlerFunc(articleHandler.GetArticle)))
 	mux.Handle("PUT /api/articles/{source_type}/{id}", authMiddleware.RequireAuth()(http.HandlerFunc(articleHandler.UpdateArticle)))
