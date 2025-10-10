@@ -23,15 +23,13 @@ export default function Home() {
     guestLogin()
     // Wait for light-up animation: 150ms delay + 300ms animation
     setTimeout(() => {
-      router.push('/guest')
+      router.push('/home')
     }, 500)
   }
 
   const handleLoginSuccess = () => {
-    // After successful login, show home view or redirect to dashboard
-    setView('home')
-    // Could redirect to dashboard instead:
-    // router.push('/dashboard')
+    // Redirect to home page after successful login
+    router.push('/home')
   }
 
   const handleBack = () => {
@@ -55,7 +53,7 @@ export default function Home() {
   }
 
   return (
-    <Layout 
+    <Layout
       leftColumn={<LogoDisplay />}
       rightColumn={getRightColumn()}
       breadcrumbs={view === 'home' ? ['Home'] : ['Login', 'Home'] }

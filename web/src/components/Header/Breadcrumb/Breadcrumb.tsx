@@ -26,8 +26,19 @@ export default function Breadcrumb({ items, showLogo = true, onItemClick }: Brea
   const [removingItems, setRemovingItems] = useState<AnimatedItem[]>([])
 
   const handleItemClick = (item: string) => {
+    // If there's a custom handler, use it
     if (onItemClick) {
       onItemClick(item)
+      return
+    }
+
+    // Otherwise, handle common navigation automatically
+    if (item === 'Home') {
+      router.push('/home')
+    } else if (item === 'Graph') {
+      router.push('/graph')
+    } else if (item === 'Admin') {
+      router.push('/admin')
     }
   }
 
@@ -165,11 +176,11 @@ export default function Breadcrumb({ items, showLogo = true, onItemClick }: Brea
       
       {/* Render current items */}
       {animatedItems.map((animatedItem) => (
-        <span 
+        <span
           key={animatedItem.key}
           className={`${animatedItem.isDivider ? styles.divider : styles.breadcrumbItem} ${
             animatedItem.isAnimating ? styles.fadeInFromRight : ''
-          } ${!animatedItem.isDivider && onItemClick ? styles.clickable : ''}`}
+          } ${!animatedItem.isDivider ? styles.clickable : ''}`}
           onClick={!animatedItem.isDivider ? () => handleItemClick(animatedItem.text) : undefined}
         >
           {animatedItem.text}
